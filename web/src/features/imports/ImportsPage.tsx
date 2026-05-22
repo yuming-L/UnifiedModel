@@ -4,6 +4,7 @@ import { UModelApi } from '../../api/client'
 import { Badge, Button, Field, JsonEditor, Panel, Tabs, TextInput } from '../../design/components'
 import { asArray, formatError, parseJson, stringify } from '../../lib/json'
 import { parseUModelElementsFromJson } from '../explorer/ExplorerPage'
+import { useI18n } from '../../i18n'
 
 type ImportMode = 'path' | 'umodel' | 'entity' | 'expire'
 
@@ -74,6 +75,7 @@ export function ImportsPage({
   const [result, setResult] = useState<unknown>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const { t } = useI18n()
 
   async function run(action: 'validate' | 'write' | 'import' | 'sample' | 'expire') {
     setBusy(true)
@@ -121,16 +123,16 @@ export function ImportsPage({
   return (
     <div className="two-column">
       <Panel
-        title={<strong>Imports & Writes</strong>}
+        title={<strong>{t('imports.title')}</strong>}
         action={
           <Tabs
             value={mode}
             onChange={setMode}
             items={[
-              { value: 'path', label: 'Path', icon: <FileInput size={14} /> },
-              { value: 'umodel', label: 'UModel', icon: <UploadCloud size={14} /> },
-              { value: 'entity', label: 'EntityStore', icon: <DatabaseZap size={14} /> },
-              { value: 'expire', label: 'Expire', icon: <CheckCircle2 size={14} /> },
+              { value: 'path', label: t('imports.path'), icon: <FileInput size={14} /> },
+              { value: 'umodel', label: t('imports.umodel'), icon: <UploadCloud size={14} /> },
+              { value: 'entity', label: t('imports.entityStore'), icon: <DatabaseZap size={14} /> },
+              { value: 'expire', label: t('imports.expire'), icon: <CheckCircle2 size={14} /> },
             ]}
           />
         }
@@ -138,20 +140,20 @@ export function ImportsPage({
         <div className="stack">
           {mode === 'path' && (
             <>
-              <Field label="Server-side path">
+              <Field label={t('imports.serverSidePath')}>
                 <TextInput value={path} onChange={(event) => setPath(event.target.value)} />
               </Field>
-              <Field label="Common schema packs JSON">
+              <Field label={t('imports.commonSchemaPacks')}>
                 <JsonEditor value={commonPacks} onChange={setCommonPacks} minHeight={90} />
               </Field>
               <div className="toolbar">
                 <Button variant="primary" disabled={busy || !path.trim()} onClick={() => void run('import')}>
                   <FileInput size={15} />
-                  Import from path
+                  {t('imports.importFromPath')}
                 </Button>
                 <Button variant="secondary" disabled={busy} onClick={() => void run('sample')}>
                   <Sparkles size={15} />
-                  Import quickstart sample data
+                  {t('imports.importSampleData')}
                 </Button>
               </div>
             </>
@@ -159,17 +161,17 @@ export function ImportsPage({
 
           {mode === 'umodel' && (
             <>
-              <Field label="UModel elements JSON">
+              <Field label={t('imports.umodelElementsJson')}>
                 <JsonEditor value={elementsJson} onChange={setElementsJson} minHeight={420} />
               </Field>
               <div className="toolbar">
                 <Button variant="secondary" disabled={busy} onClick={() => void run('validate')}>
                   <CheckCircle2 size={15} />
-                  Validate
+                  {t('imports.validate')}
                 </Button>
                 <Button variant="primary" disabled={busy} onClick={() => void run('write')}>
                   <Send size={15} />
-                  Put elements
+                  {t('imports.putElements')}
                 </Button>
               </div>
             </>
@@ -177,33 +179,33 @@ export function ImportsPage({
 
           {mode === 'entity' && (
             <>
-              <Field label="Entities JSON">
+              <Field label={t('imports.entitiesJson')}>
                 <JsonEditor value={entityJson} onChange={setEntityJson} minHeight={230} />
               </Field>
-              <Field label="Relations JSON">
+              <Field label={t('imports.relationsJson')}>
                 <JsonEditor value={relationJson} onChange={setRelationJson} minHeight={230} />
               </Field>
               <Button variant="primary" disabled={busy} onClick={() => void run('write')}>
                 <DatabaseZap size={15} />
-                Write entity and relation data
+                {t('imports.writeEntityRelation')}
               </Button>
             </>
           )}
 
           {mode === 'expire' && (
             <>
-              <Field label="Kind">
+              <Field label={t('imports.kind')}>
                 <select className="om-select" value={expireKind} onChange={(event) => setExpireKind(event.target.value as 'entity' | 'relation')}>
                   <option value="entity">entity</option>
                   <option value="relation">relation</option>
                 </select>
               </Field>
-              <Field label="IDs JSON">
+              <Field label={t('imports.idsJson')}>
                 <JsonEditor value={expireIds} onChange={setExpireIds} minHeight={160} />
               </Field>
               <Button variant="primary" disabled={busy} onClick={() => void run('expire')}>
                 <CheckCircle2 size={15} />
-                Expire
+                {t('imports.expireAction')}
               </Button>
             </>
           )}
@@ -212,8 +214,9 @@ export function ImportsPage({
         </div>
       </Panel>
 
-      <Panel title={<strong>Response</strong>}>
-        <pre className="result-box small">{result ? stringify(result) : 'No response yet.'}</pre>
+      <Panel title={<strong>{t('imports.result')}</strong>}>
+        {error && <Badge tone="danger">{error}</Badge>}
+        {result !== null ? <pre className="result-box small">{stringify(result)}</pre> : <div className="muted">{t('imports.noResult')}</div>}
       </Panel>
     </div>
   )

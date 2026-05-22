@@ -4,6 +4,7 @@ import type { WorkspaceMetadata } from '../../api/types'
 import { UModelApi } from '../../api/client'
 import { Badge, Button, Field, JsonEditor, Panel, TextInput } from '../../design/components'
 import { formatError, parseJson, stringify } from '../../lib/json'
+import { useI18n } from '../../i18n'
 
 export function SettingsPage({
   api,
@@ -26,6 +27,7 @@ export function SettingsPage({
   const [replaceConfig, setReplaceConfig] = useState(true)
   const [status, setStatus] = useState('')
   const [busy, setBusy] = useState(false)
+  const { t } = useI18n()
 
   useEffect(() => {
     setName(workspace?.name || workspaceId)
@@ -48,7 +50,7 @@ export function SettingsPage({
         replace_config: replaceConfig,
       })
       onWorkspaceChange(next)
-      setStatus('Saved')
+      setStatus(t('settings.saved'))
     } catch (error) {
       setStatus(formatError(error))
     } finally {
@@ -73,46 +75,46 @@ export function SettingsPage({
   return (
     <div className="two-column">
       <Panel
-        title={<strong>Workspace Settings</strong>}
+        title={<strong>{t('settings.title')}</strong>}
         action={workspace && <Badge tone={workspace.status === 'active' ? 'success' : 'warning'}>v{workspace.resource_version}</Badge>}
       >
         <div className="stack">
-          <Field label="Name">
+          <Field label={t('settings.name')}>
             <TextInput value={name} onChange={(event) => setName(event.target.value)} />
           </Field>
-          <Field label="Description">
+          <Field label={t('settings.description')}>
             <TextInput value={description} onChange={(event) => setDescription(event.target.value)} />
           </Field>
-          <Field label="Labels JSON">
+          <Field label={t('settings.labelsJson')}>
             <JsonEditor value={labels} onChange={setLabels} minHeight={150} />
           </Field>
           <label className="row small muted">
             <input type="checkbox" checked={replaceLabels} onChange={(event) => setReplaceLabels(event.target.checked)} />
-            replace labels
+            {t('settings.replaceLabels')}
           </label>
-          <Field label="Config JSON">
+          <Field label={t('settings.configJson')}>
             <JsonEditor value={config} onChange={setConfig} minHeight={190} />
           </Field>
           <label className="row small muted">
             <input type="checkbox" checked={replaceConfig} onChange={(event) => setReplaceConfig(event.target.checked)} />
-            replace config
+            {t('settings.replaceConfig')}
           </label>
-          {status && <Badge tone={status === 'Saved' ? 'success' : 'danger'}>{status}</Badge>}
+          {status && <Badge tone={status === t('settings.saved') ? 'success' : 'danger'}>{status}</Badge>}
           <div className="toolbar">
             <Button variant="danger" onClick={() => void remove()} disabled={busy}>
               <Trash2 size={15} />
-              Delete workspace
+              {t('settings.deleteWorkspace')}
             </Button>
             <Button variant="primary" onClick={() => void save()} disabled={busy}>
               <Save size={15} />
-              Save
+              {t('settings.save')}
             </Button>
           </div>
         </div>
       </Panel>
 
-      <Panel title={<strong>Metadata</strong>}>
-        <pre className="result-box small">{workspace ? stringify(workspace) : 'Workspace metadata is not loaded.'}</pre>
+      <Panel title={<strong>{t('settings.metadata')}</strong>}>
+        <pre className="result-box small">{workspace ? stringify(workspace) : t('settings.noMetadata')}</pre>
       </Panel>
     </div>
   )

@@ -4,6 +4,7 @@ import type { AgentDiscovery, AgentResource } from '../../api/types'
 import { UModelApi } from '../../api/client'
 import { Badge, Button, Field, JsonEditor, Panel, Select } from '../../design/components'
 import { formatError, parseJson, stringify } from '../../lib/json'
+import { useI18n } from '../../i18n'
 
 export function AgentPage({ api, workspaceId }: { api: UModelApi; workspaceId: string }) {
   const [discovery, setDiscovery] = useState<AgentDiscovery | null>(null)
@@ -14,6 +15,7 @@ export function AgentPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
   const [toolResult, setToolResult] = useState<unknown>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const { t } = useI18n()
 
   const load = useCallback(async () => {
     setBusy(true)
@@ -66,18 +68,18 @@ export function AgentPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
     <div className="page-grid">
       <div className="toolbar">
         <div>
-          <h2 style={{ margin: 0, fontSize: 18 }}>Agent Gateway</h2>
-          <div className="small muted">Discovery metadata, safe resources, and public tools.</div>
+          <h2 style={{ margin: 0, fontSize: 18 }}>{t('agent.title')}</h2>
+          <div className="small muted">{t('agent.description')}</div>
         </div>
         <Button variant="ghost" onClick={() => void load()} disabled={busy}>
           <RefreshCcw size={15} />
-          Refresh
+          {t('app.refresh')}
         </Button>
       </div>
       {error && <Badge tone="danger">{error}</Badge>}
 
       <div className="two-column">
-        <Panel title={<strong>Tools</strong>} action={discovery && <Badge>{discovery.tools.length}</Badge>}>
+        <Panel title={<strong>{t('agent.tools')}</strong>} action={discovery && <Badge>{discovery.tools.length}</Badge>}>
           <div className="stack">
             {discovery?.tools.map((tool) => (
               <div key={tool.name} className="workspace-row" style={{ cursor: 'default' }}>
@@ -85,16 +87,16 @@ export function AgentPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
                   <strong>{tool.name}</strong>
                   <span className="small muted" style={{ display: 'block', marginTop: 4 }}>{tool.description}</span>
                 </span>
-                <Badge tone={tool.enabled ? 'success' : 'warning'}>{tool.enabled ? 'enabled' : 'disabled'}</Badge>
+                <Badge tone={tool.enabled ? 'success' : 'warning'}>{tool.enabled ? t('agent.enabled') : t('agent.disabled')}</Badge>
               </div>
             ))}
-            {!discovery && <div className="muted">No discovery loaded.</div>}
+            {!discovery && <div className="muted">{t('agent.noDiscovery')}</div>}
           </div>
         </Panel>
 
-        <Panel title={<strong>Execute Tool</strong>} action={<Sparkles size={16} />}>
+        <Panel title={<strong>{t('agent.executeTool')}</strong>} action={<Sparkles size={16} />}>
           <div className="stack">
-            <Field label="Tool">
+            <Field label={t('agent.tool')}>
               <Select value={toolName} onChange={(event) => setToolName(event.target.value)}>
                 {(discovery?.tools || []).map((tool) => (
                   <option key={tool.name} value={tool.name} disabled={!tool.enabled}>
@@ -103,20 +105,20 @@ export function AgentPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
                 ))}
               </Select>
             </Field>
-            <Field label="Arguments JSON">
+            <Field label={t('agent.argumentsJson')}>
               <JsonEditor value={toolArgs} onChange={setToolArgs} minHeight={130} />
             </Field>
             <Button variant="primary" onClick={() => void executeTool()} disabled={busy || !toolName}>
               <Play size={15} />
-              Execute
+              {t('agent.execute')}
             </Button>
-            <pre className="result-box small">{toolResult ? stringify(toolResult) : 'No tool result yet.'}</pre>
+            <pre className="result-box small">{toolResult ? stringify(toolResult) : t('agent.noToolResult')}</pre>
           </div>
         </Panel>
       </div>
 
       <div className="two-column">
-        <Panel title={<strong>Resources</strong>} action={discovery && <Badge>{discovery.resources.length}</Badge>}>
+        <Panel title={<strong>{t('agent.resources')}</strong>} action={discovery && <Badge>{discovery.resources.length}</Badge>}>
           <div className="stack">
             {discovery?.resources.map((resource) => (
               <button
@@ -135,19 +137,19 @@ export function AgentPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
           </div>
         </Panel>
 
-        <Panel title={<strong>Resource Content</strong>} action={selectedResource && <Badge>{selectedResource.kind}</Badge>}>
-          <pre className="result-box small">{resourceResult ? stringify(resourceResult) : 'Select a resource to read.'}</pre>
+        <Panel title={<strong>{t('agent.resourceContent')}</strong>} action={selectedResource && <Badge>{selectedResource.kind}</Badge>}>
+          <pre className="result-box small">{resourceResult ? stringify(resourceResult) : t('agent.selectResource')}</pre>
         </Panel>
       </div>
 
-      <Panel title={<strong>Next Actions</strong>} action={discovery?.next_actions && <Badge>{discovery.next_actions.length}</Badge>}>
+      <Panel title={<strong>{t('agent.nextActions')}</strong>} action={discovery?.next_actions && <Badge>{discovery.next_actions.length}</Badge>}>
         <div style={{ overflow: 'auto' }}>
           <table className="om-table">
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Title</th>
-                <th>Tool</th>
+                <th>{t('agent.titleCol')}</th>
+                <th>{t('agent.toolCol')}</th>
                 <th>Query</th>
               </tr>
             </thead>

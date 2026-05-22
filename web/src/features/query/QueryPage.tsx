@@ -4,6 +4,7 @@ import type { QueryExplain, QueryResult } from '../../api/types'
 import { UModelApi } from '../../api/client'
 import { Badge, Button, Field, JsonEditor, Panel, TextArea, TextInput } from '../../design/components'
 import { formatError, parseJson, stringify } from '../../lib/json'
+import { useI18n } from '../../i18n'
 
 const examples = [
   { label: '.umodel', query: ".umodel with(kind='entity_set') | project domain,name,kind | sort domain,name | limit 20" },
@@ -34,6 +35,7 @@ export function QueryPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
   const [explain, setExplain] = useState<QueryExplain | null>(null)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const { t } = useI18n()
 
   async function run(kind: 'execute' | 'explain') {
     setBusy(true)
@@ -62,32 +64,32 @@ export function QueryPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
   return (
     <div className="page-grid">
       <Panel
-        title={<strong>Unified SPL Query</strong>}
+        title={<strong>{t('query.title')}</strong>}
         action={
           <div className="row">
             <Button variant="secondary" onClick={() => void run('explain')} disabled={busy}>
               <SearchCode size={15} />
-              Explain
+              {t('query.explain')}
             </Button>
             <Button variant="primary" onClick={() => void run('execute')} disabled={busy}>
               <Play size={15} />
-              Execute
+              {t('query.execute')}
             </Button>
           </div>
         }
       >
         <div className="stack">
-          <Field label="SPL">
+          <Field label={t('query.spl')}>
             <TextArea value={query} onChange={(event) => setQuery(event.target.value)} style={{ minHeight: 116 }} />
           </Field>
           <div className="row" style={{ alignItems: 'end' }}>
             <div style={{ width: 150 }}>
-              <Field label="Limit">
+              <Field label={t('query.limit')}>
                 <TextInput value={limit} onChange={(event) => setLimit(event.target.value)} />
               </Field>
             </div>
             <div style={{ flex: 1, minWidth: 260 }}>
-              <Field label="Parameters JSON">
+              <Field label={t('query.parametersJson')}>
                 <JsonEditor value={parameters} onChange={setParameters} minHeight={76} />
               </Field>
             </div>
@@ -112,11 +114,11 @@ export function QueryPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
       </Panel>
 
       <div className="two-column">
-        <Panel title={<strong>Rows</strong>} action={result && <Badge>{result.rows.length}</Badge>}>
-          {result ? <ResultTable result={result} /> : <div className="muted">No result yet.</div>}
+        <Panel title={<strong>{t('query.rows')}</strong>} action={result && <Badge>{result.rows.length}</Badge>}>
+          {result ? <ResultTable result={result} /> : <div className="muted">{t('query.noResult')}</div>}
         </Panel>
-        <Panel title={<strong>Explain</strong>} action={explain?.provider && <Badge tone="indigo">{explain.provider}</Badge>}>
-          <pre className="result-box small">{explain ? stringify(explain) : 'No explain plan yet.'}</pre>
+        <Panel title={<strong>{t('query.explainPlan')}</strong>} action={explain?.provider && <Badge tone="indigo">{explain.provider}</Badge>}>
+          <pre className="result-box small">{explain ? stringify(explain) : t('query.noExplainPlan')}</pre>
         </Panel>
       </div>
     </div>
@@ -124,7 +126,8 @@ export function QueryPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
 }
 
 export function ResultTable({ result }: { result: QueryResult }) {
-  if (result.rows.length === 0) return <div className="muted">No rows.</div>
+  const { t } = useI18n()
+  if (result.rows.length === 0) return <div className="muted">{t('query.noRows')}</div>
   const columns = result.columns.length > 0 ? result.columns : Object.keys(result.rows[0])
   return (
     <div style={{ overflow: 'auto' }}>

@@ -60,6 +60,26 @@
   gap: 10px;
 }
 
+.landing-lang-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  border: 1px solid var(--om-border);
+  border-radius: var(--om-radius);
+  background: var(--om-surface);
+  color: var(--om-text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.landing-lang-toggle:hover {
+  background: var(--om-hover);
+  border-color: var(--om-accent);
+}
+
 .brand {
   display: flex;
   align-items: center;
@@ -4456,6 +4476,31 @@
 .workspace-sidebar-footer {
   margin-top: auto;
   padding: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: stretch;
+}
+
+.workspace-lang-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 6px 0;
+  border: 1px solid var(--om-border);
+  border-radius: var(--om-radius);
+  background: var(--om-surface);
+  color: var(--om-text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.workspace-lang-toggle:hover {
+  background: var(--om-hover);
+  border-color: var(--om-accent);
 }
 
 .workspace-back-button.om-button {

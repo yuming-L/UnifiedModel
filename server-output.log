@@ -1,0 +1,13 @@
+﻿.\umodel-server.exe : 2026/05/22 15:21:58 quickstart loaded workspace=demo samp
+le=multi-domain-quickstart umodel_imported=77 umodel_skipped=2 entities=93 rela
+tions=125
+所在位置 行:1 字符: 129
++ ... ifiedModel; .\umodel-server.exe --addr :8080 --data data --graphstore ...
++                 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (2026/05/22 15:2...3 relations=125 
+   :String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+2026/05/22 15:21:58 umodel-server listening on :8080
+2026/05/22 15:21:58 listen tcp :8080: bind: Only one usage of each socket addre
+ss (protocol/network address/port) is normally permitted.

@@ -32,6 +32,7 @@ import type { QueryResult, UModelElement } from '../../api/types'
 import { UModelApi } from '../../api/client'
 import { Button, EmptyState, IconButton, SegmentedControl } from '../../design/components'
 import { asArray, formatError, parseJson, stringify } from '../../lib/json'
+import { useI18n } from '../../i18n'
 import { buildGraph, layoutGraphWithGraphviz, type ExplorerEdgeData, type ExplorerNodeData, type GraphModel } from './graphModel'
 import { SearchPanel } from './ExplorerSearchPanel'
 import { FilterBar, SettingsSidebar, SummarySidebar } from './ExplorerSidebar'
@@ -123,6 +124,7 @@ export function ExplorerPage({
   const searchBlurRef = useRef<number | null>(null)
   const searchWrapRef = useRef<HTMLDivElement | null>(null)
   const [searchPanelStyle, setSearchPanelStyle] = useState<CSSProperties>()
+  const { t } = useI18n()
 
   const updateSearchPanelGeometry = useCallback(() => {
     const wrap = searchWrapRef.current
@@ -494,10 +496,10 @@ export function ExplorerPage({
     <div className="ume-v2 openumodel-explorer">
       <aside className="ume-sidebar">
         <div className="ume-sidebar-tabs">
-          <button className={sidebarTab === 'summary' ? 'active' : ''} onClick={() => setSidebarTab('summary')} type="button" title="Summary">
+          <button className={sidebarTab === 'summary' ? 'active' : ''} onClick={() => setSidebarTab('summary')} type="button" title={t('explorer.summary')}>
             <Layers size={15} />
           </button>
-          <button className={sidebarTab === 'settings' ? 'active' : ''} onClick={() => setSidebarTab('settings')} type="button" title="Settings">
+          <button className={sidebarTab === 'settings' ? 'active' : ''} onClick={() => setSidebarTab('settings')} type="button" title={t('explorer.settings')}>
             <Settings2 size={15} />
           </button>
         </div>
@@ -534,8 +536,8 @@ export function ExplorerPage({
               value={mode}
               onChange={setMode}
               items={[
-                { value: 'graph', label: 'Graph', icon: <GitBranch size={14} /> },
-                { value: 'table', label: 'Table', icon: <Table2 size={14} /> },
+                { value: 'graph', label: t('explorer.graph'), icon: <GitBranch size={14} /> },
+                { value: 'table', label: t('explorer.table'), icon: <Table2 size={14} /> },
               ]}
             />
           </div>
@@ -590,7 +592,7 @@ export function ExplorerPage({
             {error && <span className="ume-toast danger">{error}</span>}
             <span className="ume-action-divider" />
             <div className="ume-add-menu-wrap">
-              <IconButton className="ume-icon-button" label="Add" onClick={() => setAddMenuOpen((value) => !value)} type="button">
+              <IconButton className="ume-icon-button" label={t('explorer.addElement')} onClick={() => setAddMenuOpen((value) => !value)} type="button">
                 <Plus size={15} />
               </IconButton>
               {addMenuOpen && (
@@ -610,13 +612,13 @@ export function ExplorerPage({
                 </div>
               )}
             </div>
-            <IconButton className="ume-icon-button" label="Refresh and reset draft" onClick={() => void load()} type="button">
+            <IconButton className="ume-icon-button" label={t('app.refresh')} onClick={() => void load()} type="button">
               <RefreshCcw size={15} />
             </IconButton>
-            <IconButton className="ume-icon-button" disabled={undoStack.length === 0} label="Undo" onClick={undoDraft} type="button">
+            <IconButton className="ume-icon-button" disabled={undoStack.length === 0} label={t('explorer.undo')} onClick={undoDraft} type="button">
               <Undo2 size={15} />
             </IconButton>
-            <IconButton className="ume-icon-button" disabled={redoStack.length === 0} label="Redo" onClick={redoDraft} type="button">
+            <IconButton className="ume-icon-button" disabled={redoStack.length === 0} label={t('explorer.redo')} onClick={redoDraft} type="button">
               <Redo2 size={15} />
             </IconButton>
             <button
@@ -624,7 +626,7 @@ export function ExplorerPage({
               disabled={!hasChanges}
               onClick={() => setDiffOpen(true)}
               type="button"
-              title="Review diff and submit"
+              title={t('explorer.commitChanges')}
             >
               <Save size={14} />
               Submit
@@ -655,13 +657,13 @@ export function ExplorerPage({
 
         <div className="ume-content-area">
           <main className="ume-content-main">
-            {loading && draftElements.length === 0 && <div className="ume-loading">Loading UModel graph...</div>}
-            {loading && draftElements.length > 0 && <div className="ume-layout-badge">Refreshing API</div>}
+            {loading && draftElements.length === 0 && <div className="ume-loading">{t('explorer.loadingGraph')}</div>}
+            {loading && draftElements.length > 0 && <div className="ume-layout-badge">{t('explorer.refreshingApi')}</div>}
             {!loading && draftElements.length === 0 && (
               <div className="ume-empty-wrap">
                 <EmptyState
-                  title="No UModel elements"
-                  detail="Import the bundled multi-domain UModel plus matching DevOps, k8s, automaker, game, and supplier entities."
+                  title={t('explorer.noElements')}
+                  detail={t('explorer.noElementsDetail')}
                   action={
                     <Button variant="primary" onClick={() => void importSample()}>
                       <Database size={16} />
@@ -704,9 +706,9 @@ export function ExplorerPage({
         </div>
 
         <footer className="ume-statusbar">
-          <span><strong>{filteredStats.nodes}</strong> nodes</span>
+          <span><strong>{filteredStats.nodes}</strong> {t('explorer.nodes')}</span>
           <span className="ume-status-sep" />
-          <span><strong>{filteredStats.links}</strong> links</span>
+          <span><strong>{filteredStats.links}</strong> {t('explorer.links')}</span>
           {resultLimitReached && resultLimit && (
             <>
               <span className="ume-status-sep" />
@@ -852,7 +854,7 @@ function TableView({
             })}
             {pagedRows.length === 0 && (
               <tr>
-                <td colSpan={7} className="ume-empty-cell">No matching models</td>
+                <td colSpan={7} className="ume-empty-cell">{t('explorer.noMatchingModels')}</td>
               </tr>
             )
             }
@@ -874,7 +876,7 @@ function TableView({
         <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
           {[20, 50, 100].map((size) => <option key={size} value={size}>{size} / page</option>)}
         </select>
-        <span>Total <strong>{rows.length}</strong> items</span>
+        <span>{t('explorer.total')} <strong>{rows.length}</strong> {t('explorer.items')}</span>
       </div>
     </div>
   )
@@ -920,7 +922,7 @@ function TableDeleteButton({
 
   return (
     <>
-      <button ref={buttonRef} className="ume-table-delete-button" onClick={handleClick} type="button" title={isLink ? 'Delete link' : 'Delete'}>
+      <button ref={buttonRef} className="ume-table-delete-button" onClick={handleClick} type="button" title={isLink ? t('explorer.deleteLink') : t('explorer.delete')}>
         <Trash2 size={13} />
       </button>
       {open && rect && ReactDOM.createPortal(
@@ -1034,7 +1036,7 @@ function DetailPanel({
           <code>{element.domain || 'unknown'}@{element.name || elementKey(element)}</code>
         </div>
         <span className="ume-kind-badge" style={{ background: color.bg, color: color.text }}>{color.label}</span>
-        <button className="ume-icon-button subtle" onClick={onClose} type="button" title="Close">
+        <button className="ume-icon-button subtle" onClick={onClose} type="button" title={t('explorer.close')}>
           <X size={15} />
         </button>
       </header>
@@ -1126,8 +1128,8 @@ function CreateNodeDialog({
       <section className="ume-dialog ume-dialog-wide ume-create-node-dialog">
         <header>
           <div>
-            <strong>New UModel Node</strong>
-            <span>Select a type, edit JSON, then create it in draft.</span>
+            <strong>{t('explorer.newNode')}</strong>
+          <span>{t('explorer.newNodeDetail')}</span>
           </div>
           <button className="ume-icon-button subtle" onClick={onClose} type="button">
             <X size={15} />
@@ -1163,10 +1165,10 @@ function CreateNodeDialog({
           </section>
         </div>
         <footer>
-          <button className="ume-secondary-inline" onClick={onClose} type="button">Cancel</button>
+          <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
           <button className="ume-primary-button" disabled={busy} onClick={() => void create()} type="button">
             <Plus size={14} />
-            Create
+            {t('explorer.create')}
           </button>
         </footer>
       </section>
@@ -1227,8 +1229,8 @@ function UploadDialog({
       <section className="ume-dialog ume-dialog-wide">
         <header>
           <div>
-            <strong>Upload YAML/JSON</strong>
-            <span>Import elements into the local draft. Existing ids are overwritten in draft only.</span>
+            <strong>{t('explorer.uploadYamlJson')}</strong>
+            <span>{t('explorer.uploadYamlJsonDetail')}</span>
           </div>
           <button className="ume-icon-button subtle" onClick={onClose} type="button">
             <X size={15} />
@@ -1270,10 +1272,10 @@ function UploadDialog({
           {status && <pre className="ume-result-box">{status}</pre>}
         </div>
         <footer>
-          <button className="ume-secondary-inline" onClick={onClose} type="button">Cancel</button>
+          <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
           <button className="ume-primary-button" disabled={busy} onClick={() => void upload()} type="button">
             <FileUp size={14} />
-            Add to Draft
+            {t('explorer.addToDraft')}
           </button>
         </footer>
       </section>
@@ -1395,7 +1397,7 @@ function NodePickerTable({
             })}
             {pagedRows.length === 0 && (
               <tr>
-                <td colSpan={4} className="ume-empty-cell">No matching nodes</td>
+                <td colSpan={4} className="ume-empty-cell">{t('explorer.noMatchingNodes')}</td>
               </tr>
             )}
           </tbody>
@@ -1456,8 +1458,8 @@ function ConnectDialog({
       <section className="ume-dialog ume-dialog-wide ume-connect-dialog">
         <header>
           <div>
-            <strong>{source ? 'Connect to...' : 'New Link'}</strong>
-            <span>{source ? `Create links from ${titleForElement(source)}` : 'Select a source node and target node to create a link.'}</span>
+            <strong>{source ? t('explorer.connectTo') : t('explorer.newLink')}</strong>
+            <span>{source ? `${t('explorer.createLinksFrom')} ${titleForElement(source)}` : t('explorer.selectSourceTarget')}</span>
           </div>
           <button className="ume-icon-button subtle" onClick={onClose} type="button">
             <X size={15} />
@@ -1487,13 +1489,13 @@ function ConnectDialog({
         </div>
         <footer>
           <span className="ume-connect-footer-note">
-            {selectedSource ? `Source: ${titleForElement(selectedSource)}` : 'Select a source node'}
-            {targetCount > 0 ? ` · ${targetCount} target${targetCount === 1 ? '' : 's'} selected` : ''}
+            {selectedSource ? `${t('explorer.source')}: ${titleForElement(selectedSource)}` : t('explorer.selectSourceNode')}
+            {targetCount > 0 ? ` · ${targetCount} ${t('explorer.targetsSelected')}` : ''}
           </span>
           <div>
-            <button className="ume-secondary-inline" onClick={onClose} type="button">Cancel</button>
+            <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
             <button className="ume-primary-button" disabled={!selectedSource || targetCount === 0} onClick={confirm} type="button">
-              Create{targetCount > 0 ? ` (${targetCount})` : ''}
+              {t('explorer.create')}{targetCount > 0 ? ` (${targetCount})` : ''}
             </button>
           </div>
         </footer>
@@ -1537,17 +1539,17 @@ function DiffDialog({
       <section className="ume-diff-drawer">
         <header>
           <div>
-            <strong>Submit Preview</strong>
-            <span>Review draft diff before writing to UModel API.</span>
+            <strong>{t('explorer.submitPreview')}</strong>
+            <span>{t('explorer.reviewDraftDiff')}</span>
           </div>
           <button className="ume-icon-button subtle" onClick={onClose} type="button">
             <X size={15} />
           </button>
         </header>
         <div className="ume-diff-summary">
-          <span>Added <strong>{diff.added.length}</strong></span>
-          <span>Modified <strong>{diff.modified.length}</strong></span>
-          <span>Deleted <strong>{diff.deleted.length}</strong></span>
+          <span>{t('explorer.added')} <strong>{diff.added.length}</strong></span>
+          <span>{t('explorer.modified')} <strong>{diff.modified.length}</strong></span>
+          <span>{t('explorer.deleted')} <strong>{diff.deleted.length}</strong></span>
         </div>
         <div className="ume-dialog-body">
           <div className="ume-diff-list">
@@ -1584,7 +1586,7 @@ function DiffDialog({
                 ) : <em />}
               </div>
             ))}
-            {changes.length === 0 && <div className="ume-empty-search">No draft changes</div>}
+            {changes.length === 0 && <div className="ume-empty-search">{t('explorer.noDraftChanges')}</div>}
           </div>
           <div className="ume-diff-viewer">
             {selected ? (
@@ -1614,15 +1616,15 @@ function DiffDialog({
                 />
               </>
             ) : (
-              <div className="ume-empty-search">No diff selected</div>
+              <div className="ume-empty-search">{t('explorer.noDiffSelected')}</div>
             )}
           </div>
         </div>
         <footer>
-          <button className="ume-secondary-inline" onClick={onClose} type="button">Cancel</button>
+          <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
           <button className="ume-primary-button" disabled={committing || changes.length === 0} onClick={onSubmit} type="button">
             <Save size={14} />
-            Confirm &amp; Submit
+            {t('explorer.confirmSubmit')}
           </button>
         </footer>
       </section>

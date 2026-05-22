@@ -5,6 +5,7 @@ import { UModelApi } from '../../api/client'
 import { Brand, HealthBadge } from '../../App'
 import { Button, Badge, IconButton } from '../../design/components'
 import { formatError } from '../../lib/json'
+import { useI18n } from '../../i18n'
 
 const ExplorerPage = lazy(() => import('../explorer/ExplorerPage').then(({ ExplorerPage }) => ({ default: ExplorerPage })))
 const EntityTopoPage = lazy(() => import('../entityTopo/EntityTopoPage').then(({ EntityTopoPage }) => ({ default: EntityTopoPage })))
@@ -49,6 +50,7 @@ export function WorkspaceShell({
   const [error, setError] = useState('')
   const [refreshToken, setRefreshToken] = useState(0)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const { t, locale, setLocale } = useI18n()
 
   const refresh = useCallback(async () => {
     setError('')
@@ -115,7 +117,7 @@ export function WorkspaceShell({
           </div>
           <IconButton
             className="workspace-collapse-button"
-            label={sidebarCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+            label={sidebarCollapsed ? t('shell.expandSidebar') : t('shell.collapseSidebar')}
             onClick={() => setSidebarCollapsed((value) => !value)}
             type="button"
           >
@@ -129,18 +131,26 @@ export function WorkspaceShell({
               className={view === item.value ? 'active' : ''}
               onClick={() => onViewChange(item.value)}
               type="button"
-              title={item.label}
+              title={t(item.label)}
             >
               {item.icon}
-              <span className="workspace-nav-label">{item.label}</span>
+              <span className="workspace-nav-label">{t(item.label)}</span>
             </button>
           ))}
         </nav>
         <div className="workspace-sidebar-footer">
           <Button className="workspace-back-button" variant="ghost" onClick={onBack}>
             <ArrowLeft size={16} />
-            <span className="workspace-back-label">Workspaces</span>
+            <span className="workspace-back-label">{t('shell.workspaces')}</span>
           </Button>
+          <button
+            className="workspace-lang-toggle"
+            onClick={() => setLocale(locale === 'zh-CN' ? 'en' : 'zh-CN')}
+            type="button"
+            title={locale === 'zh-CN' ? 'Switch to English' : '切换为中文'}
+          >
+            {locale === 'zh-CN' ? 'EN' : '中'}
+          </button>
         </div>
       </aside>
 
@@ -148,45 +158,45 @@ export function WorkspaceShell({
         {!explorerHost && (
         <header className="workspace-topbar">
           <div className="row" style={{ minWidth: 0 }}>
-            <Badge tone="indigo">{viewLabel(view)}</Badge>
+            <Badge tone="indigo">{viewLabel(view, t)}</Badge>
             <span className="small muted" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {error || workspace?.paths.root || 'Loading workspace metadata...'}
+              {error || workspace?.paths.root || t('shell.loadingMetadata')}
             </span>
           </div>
           <div className="row">
             <HealthBadge health={health} />
             <Button variant="ghost" onClick={() => void refresh()}>
               <RefreshCcw size={15} />
-              Refresh
+              {t('app.refresh')}
             </Button>
           </div>
         </header>
         )}
         <main className={`workspace-content ${explorerHost ? 'workspace-content-explorer' : ''}`}>
-          <Suspense fallback={<div className="workspace-page-loading">Loading...</div>}>{page}</Suspense>
+          <Suspense fallback={<div className="workspace-page-loading">{t('app.loading')}</div>}>{page}</Suspense>
         </main>
       </section>
     </div>
   )
 }
 
-function viewLabel(view: WorkspaceView): string {
+function viewLabel(view: WorkspaceView, t: (key: string, fallback?: string) => string): string {
   switch (view) {
     case 'explorer':
-      return 'UModel Explorer'
+      return t('nav.explorer')
     case 'entityTopo':
-      return 'EntityTopo Explorer'
+      return t('nav.entityTopo')
     case 'query':
-      return 'Query'
+      return t('nav.query')
     case 'imports':
-      return 'Imports'
+      return t('nav.imports')
     case 'agent':
-      return 'Agent'
+      return t('nav.agent')
     case 'settings':
-      return 'Settings'
+      return t('nav.settings')
     case 'docs':
-      return 'API Map'
+      return t('nav.apiMap')
     case 'data':
-      return 'Data'
+      return t('nav.dataStore')
   }
 }
