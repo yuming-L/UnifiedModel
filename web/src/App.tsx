@@ -1,12 +1,20 @@
-import { useMemo, useState } from 'react'
-import { Database, GitBranch, Layers, Network, PanelLeft, Settings2, Sparkles, TerminalSquare, UploadCloud } from 'lucide-react'
+import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router'
+import { GitBranch, Layers, Network, PanelLeft, Settings2, TerminalSquare, UploadCloud } from 'lucide-react'
 import { UModelApi } from './api/client'
 import type { HealthResponse, WorkspaceMetadata } from './api/types'
 import { Button, Badge, StatusDot, Field, TextInput } from './design/components'
+import { useI18n } from './i18n'
+import { scheduleMonacoPreload } from './lib/preloadMonaco'
 import { useLocalStorageState } from './lib/storage'
 import { WorkspaceLanding } from './features/workspaces/WorkspaceLanding'
+<<<<<<< HEAD
 import { WorkspaceShell, type WorkspaceView } from './features/workspace/WorkspaceShell'
 import { useI18n } from './i18n'
+=======
+import { WorkspaceShell } from './features/workspace/WorkspaceShell'
+import { defaultWorkspaceView, workspacePath, workspaceViewFromSegment, type WorkspaceView } from './routes'
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 const storageKeys = {
   apiBase: 'openumodel.apiBase',
@@ -14,57 +22,167 @@ const storageKeys = {
 }
 
 export function App() {
+  const { t } = useI18n()
   const [apiBase, setApiBase] = useLocalStorageState(storageKeys.apiBase, '')
-  const [selectedWorkspace, setSelectedWorkspace] = useLocalStorageState<string | null>(storageKeys.workspace, null)
+  const [, setLastWorkspace] = useLocalStorageState<string | null>(storageKeys.workspace, null)
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [workspace, setWorkspace] = useState<WorkspaceMetadata | null>(null)
+<<<<<<< HEAD
   const [view, setView] = useState<WorkspaceView>('explorer')
   const { t } = useI18n()
+=======
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
   const api = useMemo(() => new UModelApi(apiBase), [apiBase])
+  const navItems = useMemo(
+    () => [
+      { value: 'umodel' as const, label: t('nav.umodel'), icon: <GitBranch size={16} /> },
+      { value: 'entityTopo' as const, label: t('nav.entityTopo'), icon: <Network size={16} /> },
+      { value: 'query' as const, label: t('nav.query'), icon: <TerminalSquare size={16} /> },
+      { value: 'imports' as const, label: t('nav.imports'), icon: <UploadCloud size={16} /> },
+      { value: 'settings' as const, label: t('nav.settings'), icon: <Settings2 size={16} /> },
+      { value: 'apiDebug' as const, label: t('nav.apiMap'), icon: <Layers size={16} /> },
+    ],
+    [t],
+  )
 
-  if (!selectedWorkspace) {
-    return (
-      <WorkspaceLanding
-        api={api}
-        apiBase={apiBase}
-        onApiBaseChange={setApiBase}
-        health={health}
-        onHealthChange={setHealth}
-        onOpenWorkspace={(nextWorkspace) => {
-          setSelectedWorkspace(nextWorkspace.id)
-          setWorkspace(nextWorkspace)
-          setView('explorer')
-        }}
+  useEffect(() => scheduleMonacoPreload(), [])
+
+  return (
+    <Routes>
+      <Route
+        path="/"
+        element={
+          <LandingRoute
+            api={api}
+            apiBase={apiBase}
+            onApiBaseChange={setApiBase}
+            health={health}
+            onHealthChange={setHealth}
+            onWorkspaceOpen={(nextWorkspace) => {
+              setLastWorkspace(nextWorkspace.id)
+              setWorkspace(nextWorkspace)
+            }}
+          />
+        }
       />
-    )
-  }
+      <Route path="/workspaces/:workspaceId" element={<WorkspaceDefaultRedirect />} />
+      <Route
+        path="/workspaces/:workspaceId/:viewSegment"
+        element={
+          <WorkspaceRoute
+            api={api}
+            workspace={workspace}
+            health={health}
+            navItems={navItems}
+            onWorkspaceChange={setWorkspace}
+            onHealthChange={setHealth}
+            onWorkspaceOpen={setLastWorkspace}
+          />
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
+  )
+}
+
+function LandingRoute({
+  api,
+  apiBase,
+  onApiBaseChange,
+  health,
+  onHealthChange,
+  onWorkspaceOpen,
+}: {
+  api: UModelApi
+  apiBase: string
+  onApiBaseChange: (value: string) => void
+  health: HealthResponse | null
+  onHealthChange: (health: HealthResponse | null) => void
+  onWorkspaceOpen: (workspace: WorkspaceMetadata) => void
+}) {
+  const navigate = useNavigate()
+
+  return (
+    <WorkspaceLanding
+      api={api}
+      apiBase={apiBase}
+      onApiBaseChange={onApiBaseChange}
+      health={health}
+      onHealthChange={onHealthChange}
+      onOpenWorkspace={(nextWorkspace) => {
+        onWorkspaceOpen(nextWorkspace)
+        navigate(workspacePath(nextWorkspace.id))
+      }}
+    />
+  )
+}
+
+function WorkspaceDefaultRedirect() {
+  const { workspaceId } = useParams()
+  return <Navigate to={workspaceId ? workspacePath(workspaceId, defaultWorkspaceView) : '/'} replace />
+}
+
+function WorkspaceRoute({
+  api,
+  workspace,
+  health,
+  navItems,
+  onWorkspaceChange,
+  onHealthChange,
+  onWorkspaceOpen,
+}: {
+  api: UModelApi
+  workspace: WorkspaceMetadata | null
+  health: HealthResponse | null
+  navItems: Array<{ value: WorkspaceView; label: string; icon: ReactNode }>
+  onWorkspaceChange: (workspace: WorkspaceMetadata | null) => void
+  onHealthChange: (health: HealthResponse | null) => void
+  onWorkspaceOpen: (workspaceId: string | null) => void
+}) {
+  const navigate = useNavigate()
+  const { workspaceId, viewSegment } = useParams()
+  const view = workspaceViewFromSegment(viewSegment)
+  const activeWorkspace = workspace?.id === workspaceId ? workspace : null
+
+  useEffect(() => {
+    if (workspaceId) onWorkspaceOpen(workspaceId)
+  }, [onWorkspaceOpen, workspaceId])
+
+  if (!workspaceId) return <Navigate to="/" replace />
+  if (!view) return <Navigate to={workspacePath(workspaceId)} replace />
 
   return (
     <WorkspaceShell
       api={api}
-      workspaceId={selectedWorkspace}
-      workspace={workspace}
+      workspaceId={workspaceId}
+      workspace={activeWorkspace}
       health={health}
       view={view}
       navItems={navItems}
-      onViewChange={setView}
-      onWorkspaceChange={setWorkspace}
-      onHealthChange={setHealth}
+      onViewChange={(nextView) => navigate(workspacePath(workspaceId, nextView))}
+      onWorkspaceChange={onWorkspaceChange}
+      onHealthChange={onHealthChange}
       onBack={() => {
-        setSelectedWorkspace(null)
-        setWorkspace(null)
+        onWorkspaceOpen(null)
+        onWorkspaceChange(null)
+        navigate('/')
       }}
     />
   )
 }
 
 export function HealthBadge({ health }: { health: HealthResponse | null }) {
+  const { t } = useI18n()
   if (!health) {
     return (
       <Badge>
         <StatusDot />
+<<<<<<< HEAD
         {t('app.unknown')}
+=======
+        {t('common.health.unknown')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       </Badge>
     )
   }
@@ -101,11 +219,19 @@ export function ApiBaseField({
 }) {
   const { t } = useI18n()
   return (
+<<<<<<< HEAD
     <Field label={t('app.apiEndpoint')}>
       <TextInput
         value={apiBase}
         onChange={(event) => onApiBaseChange(event.target.value)}
         placeholder={t('app.sameOrigin')}
+=======
+    <Field label={t('landing.api.endpoint')}>
+      <TextInput
+        value={apiBase}
+        onChange={(event) => onApiBaseChange(event.target.value)}
+        placeholder={t('landing.api.placeholder')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       />
     </Field>
   )
@@ -116,6 +242,7 @@ export function SmallReloadButton({ onClick }: { onClick: () => void }) {
   return (
     <Button variant="ghost" onClick={onClick}>
       <PanelLeft size={15} />
+<<<<<<< HEAD
       {t('app.refresh')}
     </Button>
   )
@@ -131,3 +258,9 @@ const navItems = [
   { value: 'docs' as const, label: 'nav.apiMap', icon: <Layers size={16} /> },
   { value: 'data' as const, label: 'nav.dataStore', icon: <Database size={16} /> },
 ]
+=======
+      {t('common.refresh')}
+    </Button>
+  )
+}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06

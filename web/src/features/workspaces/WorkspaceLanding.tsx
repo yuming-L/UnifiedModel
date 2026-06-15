@@ -41,11 +41,15 @@ import {
   Workflow,
 } from 'lucide-react'
 import type { HealthResponse, WorkspaceMetadata } from '../../api/types'
-import { UModelApi } from '../../api/client'
+import { ApiError, UModelApi } from '../../api/client'
 import { formatError, parseJson } from '../../lib/json'
 import { Brand, HealthBadge } from '../../App'
 import { Badge, Button, EmptyState, Field, JsonEditor, Modal, TextInput } from '../../design/components'
+<<<<<<< HEAD
 import { useI18n } from '../../i18n'
+=======
+import { LanguageSelect, useI18n, type MessageKey, type TFunction } from '../../i18n'
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 export function WorkspaceLanding({
   api,
@@ -62,6 +66,7 @@ export function WorkspaceLanding({
   onHealthChange: (value: HealthResponse | null) => void
   onOpenWorkspace: (workspace: WorkspaceMetadata) => void
 }) {
+  const { t } = useI18n()
   const [workspaces, setWorkspaces] = useState<WorkspaceMetadata[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -146,13 +151,21 @@ export function WorkspaceLanding({
     [displayedWorkspaces],
   )
   const apiEndpointSummary = useMemo(() => summarizeApiEndpoint(apiBase, t), [apiBase, t])
+<<<<<<< HEAD
   const [flowNodes, , onFlowNodesChange] = useNodesState(useMemo(() => getLandingFlowNodes(t), [t]))
+=======
+  const [flowNodes, , onFlowNodesChange] = useNodesState(landingFlowNodes)
+  const activeWorkspaceCountText = activeCount === 1
+    ? t('landing.workspaces.activeCount.one', { count: activeCount })
+    : t('landing.workspaces.activeCount.other', { count: activeCount })
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
   return (
     <div className="landing app-shell">
       <header className="landing-topbar">
         <Brand />
         <div className="landing-topbar-actions">
+<<<<<<< HEAD
           <button
             className="landing-lang-toggle"
             onClick={() => setLocale(locale === 'zh-CN' ? 'en' : 'zh-CN')}
@@ -161,38 +174,61 @@ export function WorkspaceLanding({
           >
             {locale === 'zh-CN' ? 'EN' : '中'}
           </button>
+=======
+          <LanguageSelect showLabel={false} />
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
           <HealthBadge health={health} />
         </div>
       </header>
 
       <main className="landing-main flow-landing-main">
-        <section className="landing-workspace-panel" aria-label="Workspace controls">
+        <section className="landing-workspace-panel" aria-label={t('landing.aria.workspaceControls')}>
           <div className="landing-copy">
             <h1>
+<<<<<<< HEAD
               {t('landing.title')} <span className="landing-gradient-text">{t('landing.titleHighlight')}</span>{t('landing.titleSuffix')}
             </h1>
             <p>
               {t('landing.description')}
             </p>
+=======
+              {t.rich('landing.hero.title', {
+                highlight: (chunks) => <span className="landing-gradient-text">{chunks}</span>,
+              })}
+            </h1>
+            <p>{t('landing.hero.description')}</p>
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
           </div>
 
           <div className="landing-actions">
             <Button variant="primary" onClick={() => setCreateOpen(true)}>
               <FolderPlus size={16} />
+<<<<<<< HEAD
               {t('landing.createWorkspace')}
+=======
+              {t('landing.actions.createWorkspace')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </Button>
           </div>
 
           <div className="landing-api-card">
             <div className="om-field">
               <span className="om-label landing-api-label-row">
+<<<<<<< HEAD
                 <span>{t('app.apiEndpoint')}</span>
+=======
+                <span>{t('landing.api.endpoint')}</span>
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                 <span className="landing-help-wrap" onMouseEnter={showEndpointHelp} onMouseLeave={hideEndpointHelp}>
                   <button
                     ref={endpointHelpButtonRef}
                     className="landing-help-trigger"
                     type="button"
+<<<<<<< HEAD
                     aria-label={t('landing.examples')}
+=======
+                    aria-label={t('landing.api.helpLabel')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                     aria-describedby={endpointHelpPosition ? 'landing-endpoint-help' : undefined}
                     onFocus={showEndpointHelp}
                     onBlur={hideEndpointHelp}
@@ -212,6 +248,7 @@ export function WorkspaceLanding({
                         '--tooltip-top': `${endpointHelpPosition.top}px`,
                       } as CSSProperties}
                     >
+<<<<<<< HEAD
                       <strong>{t('landing.examples')}</strong>
                       <span className="landing-help-line">
                         <b>{t('landing.backend')}</b>
@@ -228,6 +265,24 @@ export function WorkspaceLanding({
                       <span className="landing-help-line">
                         <b>{t('landing.blank')}</b>
                         <span>{t('landing.blankHint')}</span>
+=======
+                      <strong>{t('landing.api.examples')}</strong>
+                      <span className="landing-help-line">
+                        <b>{t('landing.api.backend')}</b>
+                        <code>http://localhost:8080</code>
+                      </span>
+                      <span className="landing-help-line">
+                        <b>{t('landing.api.backend')}</b>
+                        <code>http://127.0.0.1:8080</code>
+                      </span>
+                      <span className="landing-help-line">
+                        <b>{t('landing.api.devProxy')}</b>
+                        <code>http://127.0.0.1:5173</code>
+                      </span>
+                      <span className="landing-help-line">
+                        <b>{t('landing.api.blank')}</b>
+                        <span>{t('landing.api.blankDetail')}</span>
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                       </span>
                     </span>,
                     document.body,
@@ -243,22 +298,35 @@ export function WorkspaceLanding({
                 <TextInput
                   value={endpointDraft}
                   onChange={(event) => setEndpointDraft(event.target.value)}
+<<<<<<< HEAD
                   placeholder={t('app.sameOrigin')}
                   spellCheck={false}
                 />
                 <Button type="submit" variant={endpointChanged ? 'primary' : 'secondary'} disabled={testingEndpoint}>
                   {testingEndpoint ? t('landing.checking') : t('landing.connect')}
+=======
+                  placeholder={t('landing.api.placeholder')}
+                  spellCheck={false}
+                />
+                <Button type="submit" variant={endpointChanged ? 'primary' : 'secondary'} disabled={testingEndpoint}>
+                  {testingEndpoint ? t('landing.api.checking') : t('landing.api.connect')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                 </Button>
               </form>
             </div>
             <div className="landing-inline-note">
               <Database size={14} />
+<<<<<<< HEAD
               {endpointChanged ? t('landing.notApplied') : t('landing.connectedEndpoint')}
+=======
+              {endpointChanged ? t('landing.api.changedNote') : t('landing.api.connectedNote')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </div>
           </div>
 
           <div className="landing-metrics">
             <div>
+<<<<<<< HEAD
               <span>{t('landing.workspaces')}</span>
               <strong>{displayedWorkspaces.length}</strong>
               <small><StatusDotLike /> {activeCount} {t('landing.active')}</small>
@@ -270,6 +338,19 @@ export function WorkspaceLanding({
             </div>
             <div>
               <span>{t('landing.api')}</span>
+=======
+              <span>{t('landing.metrics.workspaces')}</span>
+              <strong>{displayedWorkspaces.length}</strong>
+              <small><StatusDotLike /> {t('landing.metrics.active', { count: activeCount })}</small>
+            </div>
+            <div>
+              <span>{t('landing.metrics.graphstore')}</span>
+              <strong>{health?.graphstore.provider || t('common.health.unknown')}</strong>
+              <small>{health ? <><StatusDotLike /> {t('common.status.connected')}</> : <><Cable size={12} /> {t('common.status.notConnected')}</>}</small>
+            </div>
+            <div>
+              <span>{t('landing.metrics.api')}</span>
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
               <strong className="landing-api-metric-value" title={apiEndpointSummary.full}>
                 {apiEndpointSummary.title}
               </strong>
@@ -280,7 +361,11 @@ export function WorkspaceLanding({
           {error && (
             <div className="om-panel">
               <div className="om-panel-body">
+<<<<<<< HEAD
                 <Badge tone="danger">{t('landing.connectionError')}</Badge>
+=======
+                <Badge tone="danger">{t('landing.error.connection')}</Badge>
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                 <p className="small muted">{error}</p>
               </div>
             </div>
@@ -289,12 +374,21 @@ export function WorkspaceLanding({
           <div className="landing-workspace-list-card">
             <div className="landing-section-head">
               <div>
+<<<<<<< HEAD
                 <strong>{t('landing.recentWorkspaces')}</strong>
                 <span>{activeCount} {t('landing.activeWorkspace')}{activeCount === 1 ? '' : 's'}</span>
               </div>
               <Button variant="ghost" size="sm" onClick={() => void refresh()}>
                 <RefreshCcw size={14} />
                 {t('app.refresh')}
+=======
+                <strong>{t('landing.workspaces.recent')}</strong>
+                <span>{activeWorkspaceCountText}</span>
+              </div>
+              <Button variant="ghost" size="sm" onClick={() => void refresh()}>
+                <RefreshCcw size={14} />
+                {t('common.refresh')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
               </Button>
             </div>
 
@@ -302,6 +396,7 @@ export function WorkspaceLanding({
               {endpointChanged && !testingEndpoint && (
                 <div className="landing-connect-placeholder">
                   <Database size={18} />
+<<<<<<< HEAD
                   <strong>{t('landing.endpointNotConnected')}</strong>
                   <span>{t('landing.clickConnect')}</span>
                 </div>
@@ -315,6 +410,21 @@ export function WorkspaceLanding({
                     <Button variant="primary" onClick={() => setCreateOpen(true)}>
                       <FolderPlus size={16} />
                       {t('landing.createWorkspace')}
+=======
+                  <strong>{t('landing.workspaces.endpointNotConnected.title')}</strong>
+                  <span>{t('landing.workspaces.endpointNotConnected.detail')}</span>
+                </div>
+              )}
+              {loading && !endpointChanged && <div className="landing-list-note">{t('landing.workspaces.loading')}</div>}
+              {!loading && !endpointChanged && displayedWorkspaces.length === 0 && (
+                <EmptyState
+                  title={t('landing.workspaces.empty.title')}
+                  detail={t('landing.workspaces.empty.detail')}
+                  action={
+                    <Button variant="primary" onClick={() => setCreateOpen(true)}>
+                      <FolderPlus size={16} />
+                      {t('landing.actions.createWorkspace')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                     </Button>
                   }
                 />
@@ -344,7 +454,7 @@ export function WorkspaceLanding({
           </div>
         </section>
 
-        <section className="landing-stage flow-stage" aria-label="UModel product preview">
+        <section className="landing-stage flow-stage" aria-label={t('landing.aria.productPreview')}>
           <div className="flow-product-shell">
             <div className="flow-canvas-wrap">
               <ReactFlow
@@ -398,18 +508,18 @@ type LandingFlowIcon = 'api' | 'agent' | 'database' | 'diff' | 'metric' | 'query
 
 type LandingFlowNodeData = {
   icon: LandingFlowIcon
-  kind: string
-  title: string
-  subtitle: string
-  meta?: string
+  kindKey: MessageKey
+  titleKey: MessageKey
+  subtitleKey: MessageKey
+  metaKey?: MessageKey
   tone: LandingFlowTone
-  details?: string[]
+  details?: MessageKey[]
   variant?: LandingFlowNodeVariant
   width?: number
 }
 
 type LandingFlowEdgeData = {
-  label?: string
+  labelKey?: MessageKey
   tone: LandingFlowTone
 }
 
@@ -423,6 +533,7 @@ const landingFlowTones: Record<LandingFlowTone, { solid: string; soft: string; t
   slate: { solid: '#61708c', soft: 'rgba(97, 112, 140, 0.12)', text: '#36445e' },
 }
 
+<<<<<<< HEAD
 function getLandingFlowNodes(t: (key: string, fallback?: string) => string): Node<LandingFlowNodeData>[] {
   return [
     {
@@ -552,10 +663,172 @@ function getLandingFlowNodes(t: (key: string, fallback?: string) => string): Nod
         width: 294,
         details: t('landing.flow.submitDetails').split(', '),
       },
+=======
+const landingFlowNodes: Node<LandingFlowNodeData>[] = [
+  {
+    id: 'workspace',
+    type: 'landing',
+    position: { x: 430, y: 18 },
+    data: {
+      icon: 'workspace',
+      kindKey: 'landing.flow.workspace.kind',
+      titleKey: 'landing.flow.workspace.title',
+      subtitleKey: 'landing.flow.workspace.subtitle',
+      metaKey: 'landing.flow.workspace.meta',
+      tone: 'slate',
+      variant: 'source',
+      width: 286,
+      details: [
+        'landing.flow.workspace.detail.workspaceApi',
+        'landing.flow.workspace.detail.labels',
+        'landing.flow.workspace.detail.health',
+      ],
+    },
+  },
+  {
+    id: 'schema',
+    type: 'landing',
+    position: { x: 36, y: 226 },
+    data: {
+      icon: 'schema',
+      kindKey: 'landing.flow.schema.kind',
+      titleKey: 'landing.flow.schema.title',
+      subtitleKey: 'landing.flow.schema.subtitle',
+      metaKey: 'landing.flow.schema.meta',
+      tone: 'violet',
+      variant: 'schema',
+      width: 274,
+      details: [
+        'landing.flow.schema.detail.entityKind',
+        'landing.flow.schema.detail.edgeRules',
+        'landing.flow.schema.detail.schemaDiff',
+      ],
+    },
+  },
+  {
+    id: 'adapters',
+    type: 'landing',
+    position: { x: 44, y: 542 },
+    data: {
+      icon: 'database',
+      kindKey: 'landing.flow.evidence.kind',
+      titleKey: 'landing.flow.evidence.title',
+      subtitleKey: 'landing.flow.evidence.subtitle',
+      metaKey: 'landing.flow.evidence.meta',
+      tone: 'blue',
+      variant: 'adapter',
+      width: 286,
+      details: [
+        'landing.flow.evidence.detail.metrics',
+        'landing.flow.evidence.detail.ownership',
+        'landing.flow.evidence.detail.runtimeTags',
+      ],
+    },
+  },
+  {
+    id: 'graph',
+    type: 'landing',
+    position: { x: 430, y: 284 },
+    data: {
+      icon: 'service',
+      kindKey: 'landing.flow.graph.kind',
+      titleKey: 'landing.flow.graph.title',
+      subtitleKey: 'landing.flow.graph.subtitle',
+      metaKey: 'landing.flow.graph.meta',
+      tone: 'blue',
+      variant: 'core',
+      width: 356,
+      details: [
+        'landing.flow.graph.detail.entities',
+        'landing.flow.graph.detail.relations',
+        'landing.flow.graph.detail.toolContext',
+      ],
+    },
+  },
+  {
+    id: 'query',
+    type: 'landing',
+    position: { x: 872, y: 108 },
+    data: {
+      icon: 'query',
+      kindKey: 'landing.flow.query.kind',
+      titleKey: 'landing.flow.query.title',
+      subtitleKey: 'landing.flow.query.subtitle',
+      metaKey: 'landing.flow.query.meta',
+      tone: 'aqua',
+      variant: 'query',
+      width: 306,
+      details: [
+        'landing.flow.query.detail.pathSearch',
+        'landing.flow.query.detail.blastRadius',
+        'landing.flow.query.detail.filters',
+      ],
+    },
+  },
+  {
+    id: 'diff',
+    type: 'landing',
+    position: { x: 906, y: 346 },
+    data: {
+      icon: 'diff',
+      kindKey: 'landing.flow.review.kind',
+      titleKey: 'landing.flow.review.title',
+      subtitleKey: 'landing.flow.review.subtitle',
+      metaKey: 'landing.flow.review.meta',
+      tone: 'amber',
+      variant: 'review',
+      width: 286,
+      details: [
+        'landing.flow.review.detail.schemaSafe',
+        'landing.flow.review.detail.auditable',
+        'landing.flow.review.detail.reversible',
+      ],
+    },
+  },
+  {
+    id: 'agent',
+    type: 'landing',
+    position: { x: 430, y: 640 },
+    data: {
+      icon: 'agent',
+      kindKey: 'landing.flow.agent.kind',
+      titleKey: 'landing.flow.agent.title',
+      subtitleKey: 'landing.flow.agent.subtitle',
+      metaKey: 'landing.flow.agent.meta',
+      tone: 'violet',
+      variant: 'agent',
+      width: 310,
+      details: [
+        'landing.flow.agent.detail.inspect',
+        'landing.flow.agent.detail.explain',
+        'landing.flow.agent.detail.propose',
+      ],
+    },
+  },
+  {
+    id: 'submit',
+    type: 'landing',
+    position: { x: 902, y: 666 },
+    data: {
+      icon: 'api',
+      kindKey: 'landing.flow.api.kind',
+      titleKey: 'landing.flow.api.title',
+      subtitleKey: 'landing.flow.api.subtitle',
+      metaKey: 'landing.flow.api.meta',
+      tone: 'aqua',
+      variant: 'api',
+      width: 294,
+      details: [
+        'landing.flow.api.detail.workspaces',
+        'landing.flow.api.detail.elements',
+        'landing.flow.api.detail.relations',
+      ],
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
     },
   ]
 }
 
+<<<<<<< HEAD
 function getLandingFlowEdges(t: (key: string, fallback?: string) => string): Edge<LandingFlowEdgeData>[] {
   return [
     {
@@ -638,8 +911,91 @@ function getLandingFlowEdges(t: (key: string, fallback?: string) => string): Edg
     },
   ]
 }
+=======
+const landingFlowEdges: Edge<LandingFlowEdgeData>[] = [
+  {
+    id: 'workspace-graph',
+    source: 'workspace',
+    sourceHandle: 'source-bottom',
+    target: 'graph',
+    targetHandle: 'target-top',
+    type: 'landing',
+    animated: true,
+    data: { tone: 'blue', labelKey: 'landing.flow.edge.workspaceState' },
+  },
+  {
+    id: 'schema-graph',
+    source: 'schema',
+    sourceHandle: 'source-right',
+    target: 'graph',
+    targetHandle: 'target-left-upper',
+    type: 'landing',
+    animated: true,
+    data: { tone: 'violet', labelKey: 'landing.flow.edge.validatesModel' },
+  },
+  {
+    id: 'adapters-graph',
+    source: 'adapters',
+    sourceHandle: 'source-right',
+    target: 'graph',
+    targetHandle: 'target-left-lower',
+    type: 'landing',
+    animated: true,
+    data: { tone: 'blue', labelKey: 'landing.flow.edge.syncsEvidence' },
+  },
+  {
+    id: 'graph-query',
+    source: 'graph',
+    sourceHandle: 'source-right-upper',
+    target: 'query',
+    targetHandle: 'target-left',
+    type: 'landing',
+    animated: true,
+    data: { tone: 'aqua', labelKey: 'landing.flow.edge.exploreTopology' },
+  },
+  {
+    id: 'query-diff',
+    source: 'query',
+    sourceHandle: 'source-bottom',
+    target: 'diff',
+    targetHandle: 'target-top',
+    type: 'landing',
+    data: { tone: 'amber', labelKey: 'landing.flow.edge.turnsIntoPatch' },
+  },
+  {
+    id: 'graph-agent',
+    source: 'graph',
+    sourceHandle: 'source-bottom',
+    target: 'agent',
+    targetHandle: 'target-top',
+    type: 'landing',
+    animated: true,
+    data: { tone: 'violet', labelKey: 'landing.flow.edge.toolContext' },
+  },
+  {
+    id: 'diff-submit',
+    source: 'diff',
+    sourceHandle: 'source-bottom',
+    target: 'submit',
+    targetHandle: 'target-top',
+    type: 'landing',
+    animated: true,
+    data: { tone: 'amber', labelKey: 'landing.flow.edge.approvedPatch' },
+  },
+  {
+    id: 'agent-submit',
+    source: 'agent',
+    sourceHandle: 'source-right',
+    target: 'submit',
+    targetHandle: 'target-left',
+    type: 'landing',
+    data: { tone: 'violet', labelKey: 'landing.flow.edge.guardedAction' },
+  },
+]
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 const LandingFlowNode = memo(({ data }: NodeProps<Node<LandingFlowNodeData>>) => {
+  const { t } = useI18n()
   const tone = landingFlowTones[data.tone]
   const variant = data.variant || 'source'
   return (
@@ -660,18 +1016,18 @@ const LandingFlowNode = memo(({ data }: NodeProps<Node<LandingFlowNodeData>>) =>
       <Handle id="target-bottom" type="target" position={Position.Bottom} className="landing-flow-handle side-bottom" />
       <span className="landing-flow-node-icon">{landingFlowIcon(data.icon)}</span>
       <div className="landing-flow-node-copy">
-        <span className="landing-flow-node-kind">{data.kind}</span>
-        <strong>{data.title}</strong>
-        <small>{data.subtitle}</small>
+        <span className="landing-flow-node-kind">{t(data.kindKey)}</span>
+        <strong>{t(data.titleKey)}</strong>
+        <small>{t(data.subtitleKey)}</small>
         {data.details && (
           <div className="landing-flow-node-tags">
             {data.details.map((detail) => (
-              <b key={detail}>{detail}</b>
+              <b key={detail}>{t(detail)}</b>
             ))}
           </div>
         )}
       </div>
-      {data.meta && <em>{data.meta}</em>}
+      {data.metaKey && <em>{t(data.metaKey)}</em>}
       <LandingFlowNodeVisual variant={variant} />
       <Handle id="source-left" type="source" position={Position.Left} className="landing-flow-handle side-left" />
       <Handle id="source-right" type="source" position={Position.Right} className="landing-flow-handle side-right" />
@@ -695,6 +1051,7 @@ function LandingFlowEdge({
   targetPosition,
   data,
 }: EdgeProps<Edge<LandingFlowEdgeData>>) {
+  const { t } = useI18n()
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -737,7 +1094,7 @@ function LandingFlowEdge({
         }}
       />
       <circle cx={targetX} cy={targetY} r={4.4} fill="#ffffff" stroke={tone.solid} strokeWidth={2.1} />
-      {data?.label && (
+      {data?.labelKey && (
         <EdgeLabelRenderer>
           <span
             className="landing-flow-edge-label"
@@ -747,7 +1104,7 @@ function LandingFlowEdge({
               transform: `translate(-50%, -50%) translate(${labelX}px, ${labelY}px)`,
             } as CSSProperties}
           >
-            {data.label}
+            {t(data.labelKey)}
           </span>
         </EdgeLabelRenderer>
       )}
@@ -756,6 +1113,7 @@ function LandingFlowEdge({
 }
 
 function LandingFlowNodeVisual({ variant }: { variant: LandingFlowNodeVariant }) {
+  const { t } = useI18n()
   if (variant === 'core') {
     return (
       <div className="landing-flow-visual visual-core" aria-hidden="true">
@@ -773,9 +1131,9 @@ function LandingFlowNodeVisual({ variant }: { variant: LandingFlowNodeVariant })
   if (variant === 'schema') {
     return (
       <div className="landing-flow-visual visual-schema" aria-hidden="true">
-        <span>Entity</span>
-        <span>Relation</span>
-        <span>Version</span>
+        <span>{t('landing.flow.visual.entity')}</span>
+        <span>{t('landing.flow.visual.relation')}</span>
+        <span>{t('landing.flow.visual.version')}</span>
       </div>
     )
   }
@@ -794,7 +1152,7 @@ function LandingFlowNodeVisual({ variant }: { variant: LandingFlowNodeVariant })
   if (variant === 'query') {
     return (
       <div className="landing-flow-visual visual-query" aria-hidden="true">
-        <span>service / metric / owner</span>
+        <span>{t('landing.flow.visual.ownerQuery')}</span>
         <i />
       </div>
     )
@@ -813,8 +1171,8 @@ function LandingFlowNodeVisual({ variant }: { variant: LandingFlowNodeVariant })
   if (variant === 'agent') {
     return (
       <div className="landing-flow-visual visual-agent" aria-hidden="true">
-        <span>inspect()</span>
-        <span>explain()</span>
+        <span>{t('landing.flow.visual.inspect')}</span>
+        <span>{t('landing.flow.visual.explain')}</span>
       </div>
     )
   }
@@ -856,13 +1214,21 @@ function normalizeApiBase(value: string) {
   return value.trim().replace(/\/+$/, '')
 }
 
+<<<<<<< HEAD
 function summarizeApiEndpoint(value: string, t: (key: string, fallback?: string) => string) {
   const normalized = normalizeApiBase(value)
   if (!normalized) {
     return {
       title: t('app.sameOrigin'),
+=======
+function summarizeApiEndpoint(value: string, t: TFunction) {
+  const normalized = normalizeApiBase(value)
+  if (!normalized) {
+    return {
+      title: t('landing.api.sameOrigin'),
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       detail: '/api proxy',
-      full: 'same origin',
+      full: t('landing.api.sameOriginFull'),
     }
   }
   try {
@@ -894,6 +1260,7 @@ function CreateWorkspaceModal({
   onClose: () => void
   onCreated: (workspace: WorkspaceMetadata) => void
 }) {
+  const { t } = useI18n()
   const [id, setId] = useState('demo')
   const [name, setName] = useState('Demo')
   const [description, setDescription] = useState('Local UModel workspace')
@@ -910,11 +1277,11 @@ function CreateWorkspaceModal({
         id,
         name,
         description,
-        labels: labels.trim() ? parseJson<Record<string, string>>(labels, 'Labels JSON') : undefined,
+        labels: labels.trim() ? parseJson<Record<string, string>>(labels, t('landing.modal.labelsJson')) : undefined,
       })
       onCreated(workspace)
     } catch (nextError) {
-      setError(formatError(nextError))
+      setError(formatCreateWorkspaceError(nextError, t))
     } finally {
       setSaving(false)
     }
@@ -922,22 +1289,34 @@ function CreateWorkspaceModal({
 
   return (
     <Modal
+<<<<<<< HEAD
       title={t('landing.createTitle')}
+=======
+      title={t('landing.modal.create.title')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       onClose={onClose}
       footer={
         <div className="toolbar" style={{ width: '100%' }}>
-          <div className="small muted">{error}</div>
+          <div />
           <div className="row">
+<<<<<<< HEAD
             <Button variant="ghost" onClick={onClose}>{t('landing.createCancel')}</Button>
             <Button variant="primary" onClick={() => void submit()} disabled={saving || !id.trim()}>
               <FolderPlus size={16} />
               {t('landing.createCreate')}
+=======
+            <Button variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
+            <Button variant="primary" onClick={() => void submit()} disabled={saving || !id.trim()}>
+              <FolderPlus size={16} />
+              {t('common.create')}
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </Button>
           </div>
         </div>
       }
     >
       <div className="stack">
+<<<<<<< HEAD
         <Field label={t('landing.createIdLabel')}>
           <TextInput value={id} onChange={(event) => setId(event.target.value)} placeholder="demo" />
         </Field>
@@ -953,7 +1332,30 @@ function CreateWorkspaceModal({
         <div className="small muted">
           {t('landing.createIdHint')}
         </div>
+=======
+        {error && <div className="landing-create-error">{error}</div>}
+        <Field label={t('landing.modal.workspaceId')}>
+          <TextInput value={id} onChange={(event) => setId(event.target.value)} placeholder="demo" />
+        </Field>
+        <Field label={t('landing.modal.name')}>
+          <TextInput value={name} onChange={(event) => setName(event.target.value)} placeholder="Demo" />
+        </Field>
+        <Field label={t('landing.modal.description')}>
+          <TextInput value={description} onChange={(event) => setDescription(event.target.value)} />
+        </Field>
+        <Field label={t('landing.modal.labelsJson')}>
+          <JsonEditor value={labels} onChange={setLabels} minHeight={120} />
+        </Field>
+        <div className="small muted">{t('landing.modal.idHelp')}</div>
+>>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       </div>
     </Modal>
   )
+}
+
+function formatCreateWorkspaceError(error: unknown, t: TFunction) {
+  if (error instanceof ApiError && error.code === 'WORKSPACE_TOMBSTONED') {
+    return t('landing.modal.error.tombstoned')
+  }
+  return formatError(error)
 }
