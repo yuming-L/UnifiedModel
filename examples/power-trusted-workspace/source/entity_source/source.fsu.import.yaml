@@ -1,0 +1,25 @@
+kind: entity_source
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "source.fsu.import"
+  domain: source
+  display_name:
+    en_us: "FSU Import Job"
+    zh_cn: "FSU 导入任务"
+  description:
+    en_us: "Import job that feeds FSU telemetry and fault evidence into the trusted workspace."
+    zh_cn: "将 FSU 遥测与故障证据导入可信工作空间的任务。"
+spec:
+  constructor:
+    job: "fsu_ingest"
+    schedule: "*/5 * * * *"
+    mode: "incremental"
+  storages:
+    - type: "kafka"
+      name: "fsu-telemetry-bus"
+      brokers: "kafka.power.example:9092"
+    - type: "mysql"
+      name: "fsu-evidence-store"
+      endpoint: "mysql.power.example:3306"

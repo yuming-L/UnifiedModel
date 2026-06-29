@@ -1,0 +1,22 @@
+kind: storage_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device.logs_to_elasticsearch"
+  domain: power
+  display_name:
+    en_us: "Device logs stored in Elasticsearch"
+    zh_cn: "设备日志存储到 Elasticsearch"
+spec:
+  src:
+    domain: power
+    kind: log_set
+    name: power.device.logs
+  dest:
+    domain: power
+    kind: elasticsearch
+    name: power.elasticsearch.logs
+  fields_mapping:
+    target_id: target_id
+    level: level

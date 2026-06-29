@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+﻿﻿import { useEffect, useMemo, useState, type ReactNode } from 'react'
 import { Navigate, Route, Routes, useNavigate, useParams } from 'react-router'
 import { GitBranch, Layers, Network, PanelLeft, Settings2, TerminalSquare, UploadCloud } from 'lucide-react'
 import { UModelApi } from './api/client'
@@ -8,13 +8,8 @@ import { useI18n } from './i18n'
 import { scheduleMonacoPreload } from './lib/preloadMonaco'
 import { useLocalStorageState } from './lib/storage'
 import { WorkspaceLanding } from './features/workspaces/WorkspaceLanding'
-<<<<<<< HEAD
-import { WorkspaceShell, type WorkspaceView } from './features/workspace/WorkspaceShell'
-import { useI18n } from './i18n'
-=======
 import { WorkspaceShell } from './features/workspace/WorkspaceShell'
 import { defaultWorkspaceView, workspacePath, workspaceViewFromSegment, type WorkspaceView } from './routes'
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 const storageKeys = {
   apiBase: 'openumodel.apiBase',
@@ -27,11 +22,6 @@ export function App() {
   const [, setLastWorkspace] = useLocalStorageState<string | null>(storageKeys.workspace, null)
   const [health, setHealth] = useState<HealthResponse | null>(null)
   const [workspace, setWorkspace] = useState<WorkspaceMetadata | null>(null)
-<<<<<<< HEAD
-  const [view, setView] = useState<WorkspaceView>('explorer')
-  const { t } = useI18n()
-=======
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
   const api = useMemo(() => new UModelApi(apiBase), [apiBase])
   const navItems = useMemo(
@@ -178,11 +168,7 @@ export function HealthBadge({ health }: { health: HealthResponse | null }) {
     return (
       <Badge>
         <StatusDot />
-<<<<<<< HEAD
-        {t('app.unknown')}
-=======
         {t('common.health.unknown')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       </Badge>
     )
   }
@@ -219,19 +205,11 @@ export function ApiBaseField({
 }) {
   const { t } = useI18n()
   return (
-<<<<<<< HEAD
-    <Field label={t('app.apiEndpoint')}>
-      <TextInput
-        value={apiBase}
-        onChange={(event) => onApiBaseChange(event.target.value)}
-        placeholder={t('app.sameOrigin')}
-=======
     <Field label={t('landing.api.endpoint')}>
       <TextInput
         value={apiBase}
         onChange={(event) => onApiBaseChange(event.target.value)}
         placeholder={t('landing.api.placeholder')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       />
     </Field>
   )
@@ -242,25 +220,7 @@ export function SmallReloadButton({ onClick }: { onClick: () => void }) {
   return (
     <Button variant="ghost" onClick={onClick}>
       <PanelLeft size={15} />
-<<<<<<< HEAD
-      {t('app.refresh')}
-    </Button>
-  )
-}
-
-const navItems = [
-  { value: 'explorer' as const, label: 'nav.explorer', icon: <GitBranch size={16} /> },
-  { value: 'entityTopo' as const, label: 'nav.entityTopo', icon: <Network size={16} /> },
-  { value: 'query' as const, label: 'nav.query', icon: <TerminalSquare size={16} /> },
-  { value: 'imports' as const, label: 'nav.imports', icon: <UploadCloud size={16} /> },
-  { value: 'agent' as const, label: 'nav.agent', icon: <Sparkles size={16} /> },
-  { value: 'settings' as const, label: 'nav.settings', icon: <Settings2 size={16} /> },
-  { value: 'docs' as const, label: 'nav.apiMap', icon: <Layers size={16} /> },
-  { value: 'data' as const, label: 'nav.dataStore', icon: <Database size={16} /> },
-]
-=======
       {t('common.refresh')}
     </Button>
   )
 }
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06

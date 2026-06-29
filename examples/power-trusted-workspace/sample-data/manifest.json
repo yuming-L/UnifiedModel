@@ -1,0 +1,66 @@
+{
+  "sample": "power-trusted-workspace",
+  "title": "Power Trusted Workspace",
+  "description": "A trusted data space sample for power operations that combines topology, FSU telemetry, model registry assets, and runbook-guided knowledge into one governed workspace.",
+  "schema_pack": "examples/power-trusted-workspace",
+  "domains": [
+    "power",
+    "source"
+  ],
+  "entities": "entities.json",
+  "relations": "relations.json",
+  "scenario": {
+    "title": "Power Device Health and Backup-Time Workspace",
+    "topology": "power.station -> power.feeder -> power.transformer -> power.device",
+    "operational_story": "The workspace exposes a single device chain with live telemetry, alarm evidence, source provenance, and model registry entries for anomaly detection, load forecasting, and backup-duration estimation.",
+    "governance_story": "Data assets, knowledge assets, and model assets are packaged together so agents can trace source, version, and usage before acting.",
+    "analysis_flow": "Start from the station, traverse to the device, inspect telemetry and events, then consult the runbook and attached model registry before recommending action."
+  },
+  "seed_entities_note": "display_name values are for documentation; actual __entity_id__ values are 32-char MD5 hex of the semantic names below",
+  "seed_entities": {
+    "source_fsu": "19e18f7c0845259dd5a24f568d367aa9",
+    "station_main": "dad38736f9f6029ebfcbc10cac2f322f",
+    "feeder_main": "1f14c84adb3fd7ced4973907b27703c3",
+    "transformer_main": "6c64d97e4a528190292ad4139c9e2d85",
+    "device_main": "43f0ced32bc3dbbdfd3ccf1225a3fc1b",
+    "battery_main": "1255c28361af80aafd22715005fed882",
+    "model_anomaly": "78fa2e139709cbd32e95572d702be507",
+    "model_forecast": "3d28251110da8eba2a80fe449d6b0600",
+    "model_backup": "4821f1436b47a07f63acf8f72b52e600"
+  },
+  "counts": {
+    "entity_sets": 6,
+    "entity_set_links": 5,
+    "runbook_sets": 1,
+    "runbook_links": 1,
+    "metric_sets": 1,
+    "log_sets": 1,
+    "event_sets": 1,
+    "storages": 4,
+    "data_links": 5,
+    "storage_links": 3,
+    "entities": 9,
+    "relations": 9
+  },
+  "included_kinds": [
+    "entity_set",
+    "entity_set_link",
+    "runbook_set",
+    "runbook_link",
+    "metric_set",
+    "log_set",
+    "event_set",
+    "prometheus",
+    "elasticsearch",
+    "mysql",
+    "external_storage",
+    "entity_source",
+    "entity_source_link",
+    "data_link",
+    "storage_link"
+  ],
+  "excluded_kinds": [
+    "trace_set",
+    "profile_set"
+  ]
+}

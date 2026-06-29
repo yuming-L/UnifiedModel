@@ -23,6 +23,8 @@ UModel 支持：
 
 AI Agent 在 `quickstart-multidomain` workspace 上读取对象图（90 秒）：发现服务、沿跨域拓扑遍历、并通过模型自动生成的查询计划拉取指标和日志，全程不手写一条查询。
 
+电力运维示例包：[电力可信工作区示例包](examples/power-trusted-workspace/README.zh-CN.md)。运行 `make power-demo` 可以直接打开电力拓扑、FSU 遥测、模型资产和运维手册组成的可信工作区。
+
 ## 为什么需要 UModel
 
 - 加速企业 AI 规模化落地。统一语义标准让 AI 模型理解来自不同平台、不同部门、不同工具和不同领域的数据含义，提升智能运维、智能客服、智能分析、智能预测和 Agent 工作流的落地效率。
@@ -118,7 +120,7 @@ UModel 围绕 workspace-scoped object graph 运行本地服务：
 | 指南 | [模型编写](docs/zh/guides/model-authoring.md)、[实体与关系写入](docs/zh/guides/entity-relation-writes.md)、[Query Service](docs/zh/guides/query-service.md)、[Web UI](docs/zh/guides/web-ui.md)、[SDK 与客户端](docs/zh/guides/sdk-clients.md) |
 | 架构 | [架构总览](docs/zh/architecture/overview.md)、[运行时流程](docs/zh/architecture/runtime-flow.md)、[Query 与 Agent 架构](docs/zh/architecture/query-and-agent.md) |
 | 参考 | [CLI](docs/zh/reference/cli.md)、[MCP](docs/zh/reference/mcp.md)、[REST OpenAPI](api/openapi/openapi.yaml)、[MCP Tool 和 Resource Schema](api/mcp/tools.schema.json) |
-| 示例 | [多域 Quickstart 示例包](examples/quickstart-multidomain/README.zh-CN.md)、[故障排查 Demo（AI Agent）](examples/incident-investigation/README.zh-CN.md)、[服务定位 Demo（AI Agent）](examples/service-localization/README.zh-CN.md) |
+| 示例 | [多域 Quickstart 示例包](examples/quickstart-multidomain/README.zh-CN.md)、[电力可信工作区示例包](examples/power-trusted-workspace/README.zh-CN.md)、[故障排查 Demo（AI Agent）](examples/incident-investigation/README.zh-CN.md)、[服务定位 Demo（AI Agent）](examples/service-localization/README.zh-CN.md) |
 | Agent 技能 | [UModel Agent 技能](skills/README.zh-CN.md) —— 可加载给 MCP/CLI Agent 的技能：读实体/关系/模型数据，做模型引导的根因分析 |
 | 部署 | [Docker 与 Compose](deployments/README.zh-CN.md) |
 

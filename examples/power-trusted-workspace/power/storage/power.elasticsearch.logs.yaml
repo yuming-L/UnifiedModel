@@ -1,0 +1,24 @@
+kind: elasticsearch
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.elasticsearch.logs"
+  domain: power
+  display_name:
+    en_us: "Power Elasticsearch Logs"
+    zh_cn: "电力日志 Elasticsearch"
+  description:
+    en_us: "Elasticsearch-compatible log endpoint for power device logs."
+    zh_cn: "电力设备日志使用的 Elasticsearch 兼容端点。"
+spec:
+  endpoint: "http://elasticsearch.power.example:9200"
+  index: "power-device-logs-*"
+  query_dialect: elasticsearch_dsl
+  time_field: timestamp
+  default_size: 500
+  max_size: 5000
+  tls_verify: true
+  tags:
+    sample: power-trusted-workspace
+    role: logs

@@ -1,18 +1,13 @@
-import { useState, type ReactNode } from 'react'
+﻿import { useState, type ReactNode } from 'react'
 import Editor from '@monaco-editor/react'
 import { CheckCircle2, DatabaseZap, Send, UploadCloud } from 'lucide-react'
 import { UModelApi } from '../../api/client'
 import { Badge, Button, SegmentedControl } from '../../design/components'
 import { useI18n, type MessageKey } from '../../i18n'
 import { asArray, formatError, parseJson, stringify } from '../../lib/json'
-<<<<<<< HEAD
-import { parseUModelElementsFromJson } from '../explorer/ExplorerPage'
-import { useI18n } from '../../i18n'
-=======
 import { disableMonacoEditContext } from '../../lib/preloadMonaco'
 import { parseUModelElementsFromJson } from '../umodel/UModelPage'
 import './imports.css'
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 disableMonacoEditContext()
 
@@ -115,13 +110,9 @@ export function ImportsPage({
   const [results, setResults] = useState<ModeResults>({})
   const [errors, setErrors] = useState<ModeErrors>({})
   const [busy, setBusy] = useState(false)
-<<<<<<< HEAD
-  const { t } = useI18n()
-=======
   const activeExpireIds = expireKind === 'entity' ? expireEntityIds : expireRelationIds
   const activeResult = results[mode] ?? null
   const activeError = errors[mode] ?? ''
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
   async function run(action: 'validate' | 'write' | 'expire') {
     const targetMode = mode
@@ -157,93 +148,6 @@ export function ImportsPage({
   }
 
   return (
-<<<<<<< HEAD
-    <div className="two-column">
-      <Panel
-        title={<strong>{t('imports.title')}</strong>}
-        action={
-          <Tabs
-            value={mode}
-            onChange={setMode}
-            items={[
-              { value: 'path', label: t('imports.path'), icon: <FileInput size={14} /> },
-              { value: 'umodel', label: t('imports.umodel'), icon: <UploadCloud size={14} /> },
-              { value: 'entity', label: t('imports.entityStore'), icon: <DatabaseZap size={14} /> },
-              { value: 'expire', label: t('imports.expire'), icon: <CheckCircle2 size={14} /> },
-            ]}
-          />
-        }
-      >
-        <div className="stack">
-          {mode === 'path' && (
-            <>
-              <Field label={t('imports.serverSidePath')}>
-                <TextInput value={path} onChange={(event) => setPath(event.target.value)} />
-              </Field>
-              <Field label={t('imports.commonSchemaPacks')}>
-                <JsonEditor value={commonPacks} onChange={setCommonPacks} minHeight={90} />
-              </Field>
-              <div className="toolbar">
-                <Button variant="primary" disabled={busy || !path.trim()} onClick={() => void run('import')}>
-                  <FileInput size={15} />
-                  {t('imports.importFromPath')}
-                </Button>
-                <Button variant="secondary" disabled={busy} onClick={() => void run('sample')}>
-                  <Sparkles size={15} />
-                  {t('imports.importSampleData')}
-                </Button>
-              </div>
-            </>
-          )}
-
-          {mode === 'umodel' && (
-            <>
-              <Field label={t('imports.umodelElementsJson')}>
-                <JsonEditor value={elementsJson} onChange={setElementsJson} minHeight={420} />
-              </Field>
-              <div className="toolbar">
-                <Button variant="secondary" disabled={busy} onClick={() => void run('validate')}>
-                  <CheckCircle2 size={15} />
-                  {t('imports.validate')}
-                </Button>
-                <Button variant="primary" disabled={busy} onClick={() => void run('write')}>
-                  <Send size={15} />
-                  {t('imports.putElements')}
-                </Button>
-              </div>
-            </>
-          )}
-
-          {mode === 'entity' && (
-            <>
-              <Field label={t('imports.entitiesJson')}>
-                <JsonEditor value={entityJson} onChange={setEntityJson} minHeight={230} />
-              </Field>
-              <Field label={t('imports.relationsJson')}>
-                <JsonEditor value={relationJson} onChange={setRelationJson} minHeight={230} />
-              </Field>
-              <Button variant="primary" disabled={busy} onClick={() => void run('write')}>
-                <DatabaseZap size={15} />
-                {t('imports.writeEntityRelation')}
-              </Button>
-            </>
-          )}
-
-          {mode === 'expire' && (
-            <>
-              <Field label={t('imports.kind')}>
-                <select className="om-select" value={expireKind} onChange={(event) => setExpireKind(event.target.value as 'entity' | 'relation')}>
-                  <option value="entity">entity</option>
-                  <option value="relation">relation</option>
-                </select>
-              </Field>
-              <Field label={t('imports.idsJson')}>
-                <JsonEditor value={expireIds} onChange={setExpireIds} minHeight={160} />
-              </Field>
-              <Button variant="primary" disabled={busy} onClick={() => void run('expire')}>
-                <CheckCircle2 size={15} />
-                {t('imports.expireAction')}
-=======
     <div className="imports-workbench">
       <header className="imports-head">
         <ModePicker value={mode} onChange={setMode} />
@@ -257,7 +161,6 @@ export function ImportsPage({
               <Button className="imports-primary-button" variant="primary" disabled={busy} onClick={() => void run('write')}>
                 <Send size={15} />
                 {t('imports.action.put')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
               </Button>
             </>
           )}
@@ -276,12 +179,6 @@ export function ImportsPage({
         </div>
       </header>
 
-<<<<<<< HEAD
-      <Panel title={<strong>{t('imports.result')}</strong>}>
-        {error && <Badge tone="danger">{error}</Badge>}
-        {result !== null ? <pre className="result-box small">{stringify(result)}</pre> : <div className="muted">{t('imports.noResult')}</div>}
-      </Panel>
-=======
       {activeError && <div className="imports-error">{activeError}</div>}
 
       <div className="imports-layout">
@@ -451,7 +348,6 @@ function MonacoBlock({
           wordWrap: 'on',
         }}
       />
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
     </div>
   )
 }

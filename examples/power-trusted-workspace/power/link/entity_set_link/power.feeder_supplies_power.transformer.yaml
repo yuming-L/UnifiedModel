@@ -1,0 +1,20 @@
+kind: entity_set_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.feeder_supplies_power.transformer"
+  domain: power
+  display_name:
+    en_us: "Feeder supplies transformer"
+    zh_cn: "馈线供电变压器"
+spec:
+  src:
+    domain: power
+    kind: entity_set
+    name: power.feeder
+  dest:
+    domain: power
+    kind: entity_set
+    name: power.transformer
+  entity_link_type: supplies

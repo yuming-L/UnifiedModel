@@ -1,0 +1,19 @@
+kind: entity_source_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "source.fsu.imports_power.battery_pack"
+  domain: source
+  display_name:
+    en_us: "FSU imports battery pack"
+    zh_cn: "FSU 导入蓄电池组"
+spec:
+  src:
+    domain: source
+    kind: entity_source
+    name: source.fsu.import
+  dest:
+    domain: power
+    kind: entity_set
+    name: power.battery_pack

@@ -15,18 +15,22 @@ import (
 )
 
 func TestLookupSampleCanonicalizesAliases(t *testing.T) {
-	for _, input := range []string{
-		MultiDomainQuickStartSample,
-		"quickstart-multidomain",
-		"quickstart",
-		"  QUICKSTART  ",
-	} {
+	cases := map[string]string{
+		MultiDomainQuickStartSample: MultiDomainQuickStartSample,
+		"quickstart-multidomain":    MultiDomainQuickStartSample,
+		"quickstart":                MultiDomainQuickStartSample,
+		"  QUICKSTART  ":            MultiDomainQuickStartSample,
+		PowerDemoSample:             PowerTrustedWorkspaceSample,
+		"power-trusted":             PowerTrustedWorkspaceSample,
+		"trusted-workspace":         PowerTrustedWorkspaceSample,
+	}
+	for input, want := range cases {
 		def, ok := lookupSample(input)
 		if !ok {
 			t.Fatalf("expected %q to resolve", input)
 		}
-		if def.Name != MultiDomainQuickStartSample {
-			t.Fatalf("expected canonical sample %q for %q, got %q", MultiDomainQuickStartSample, input, def.Name)
+		if def.Name != want {
+			t.Fatalf("expected canonical sample %q for %q, got %q", want, input, def.Name)
 		}
 	}
 }
@@ -44,6 +48,9 @@ func TestImportUnknownSampleListsAvailableSamples(t *testing.T) {
 	}
 	if !strings.Contains(coded.Details["available"], MultiDomainQuickStartSample) {
 		t.Fatalf("expected available samples to include %q, got %+v", MultiDomainQuickStartSample, coded.Details)
+	}
+	if !strings.Contains(coded.Details["available"], PowerTrustedWorkspaceSample) {
+		t.Fatalf("expected available samples to include %q, got %+v", PowerTrustedWorkspaceSample, coded.Details)
 	}
 }
 
@@ -200,5 +207,87 @@ func TestImportMultiDomainQuickStartWritesSchemaEntitiesAndTopology(t *testing.T
 	}
 	if len(cypherRows.Rows) == 0 {
 		t.Fatalf("expected cypher to see sample topology, got %+v", cypherRows)
+	}
+}
+
+func TestImportPowerTrustedWorkspaceWritesSchemaEntitiesAndTopology(t *testing.T) {
+	ctx := context.Background()
+	graph := graphstore.NewMemoryStore()
+	umodelSvc := umodel.NewService(graph)
+	entitySvc := entitystore.NewService(graph, umodelSvc)
+	svc := NewService(umodelSvc, entitySvc)
+
+	result, err := svc.Import(ctx, "power-demo", PowerTrustedWorkspaceSample)
+	if err != nil {
+		t.Fatalf("import power sample: %v", err)
+	}
+	if result.Sample != PowerTrustedWorkspaceSample || result.UModel.Imported == 0 {
+		t.Fatalf("expected power sample import, got %+v", result)
+	}
+	if result.EntityCount == 0 || result.Entities.Accepted != result.EntityCount {
+		t.Fatalf("expected all power sample entities accepted, got %+v", result)
+	}
+	if result.RelationCount == 0 || result.Relations.Accepted != result.RelationCount {
+		t.Fatalf("expected all power sample relations accepted, got %+v", result)
+	}
+
+	querySvc := query.NewService(graph)
+	for _, kind := range []string{"entity_set", "data_link", "runbook_set", "runbook_link", "metric_set", "log_set", "event_set", "prometheus", "elasticsearch", "mysql"} {
+		rows, err := querySvc.Execute(ctx, "power-demo", model.QueryRequest{
+			Query: ".umodel with(kind='" + kind + "') | limit 1",
+		})
+		if err != nil {
+			t.Fatalf("query power sample kind %s: %v", kind, err)
+		}
+		if len(rows.Rows) == 0 {
+			t.Fatalf("power demo should import %s definitions, got %+v", kind, rows)
+		}
+	}
+
+	dataSetRows, err := querySvc.Execute(ctx, "power-demo", model.QueryRequest{
+		Query: ".entity_set with(domain='power', name='power.device') | entity-call list_data_set(['metric_set', 'log_set', 'event_set'], true)",
+	})
+	if err != nil {
+		t.Fatalf("list power data sets: %v", err)
+	}
+	if len(dataSetRows.Rows) != 1 {
+		t.Fatalf("expected assistant response row, got %+v", dataSetRows.Rows)
+	}
+	data, ok := dataSetRows.Rows[0]["data"].([]map[string]any)
+	if !ok || len(data) != 3 {
+		t.Fatalf("expected metric, log, and event data sets, got %#v", dataSetRows.Rows[0]["data"])
+	}
+	joinedData := ""
+	for _, item := range data {
+		values, ok := item["values"].([]string)
+		if !ok {
+			t.Fatalf("unexpected list_data_set row: %#v", item)
+		}
+		joinedData += strings.Join(values, "\n")
+	}
+	for _, want := range []string{"power.device.metrics", "power.device.logs", "power.device.events", "power.prometheus.core", "power.elasticsearch.logs", "power.mysql.events"} {
+		if !strings.Contains(joinedData, want) {
+			t.Fatalf("expected list_data_set output to contain %q, got %s", want, joinedData)
+		}
+	}
+
+	runbookRows, err := querySvc.Execute(ctx, "power-demo", model.QueryRequest{
+		Query: ".umodel with(kind='runbook_set', name='power.device.ops') | limit 1",
+	})
+	if err != nil {
+		t.Fatalf("query power runbook set: %v", err)
+	}
+	if len(runbookRows.Rows) == 0 {
+		t.Fatalf("expected power runbook set rows, got %+v", runbookRows)
+	}
+
+	topoRows, err := querySvc.Execute(ctx, "power-demo", model.QueryRequest{
+		Query: ".topo | graph-call getDirectRelations([(:\"power@power.station\" {__entity_id__: 'dad38736f9f6029ebfcbc10cac2f322f'})]) | limit 20",
+	})
+	if err != nil {
+		t.Fatalf("query power topology: %v", err)
+	}
+	if len(topoRows.Rows) == 0 {
+		t.Fatalf("expected power topology relations, got %+v", topoRows)
 	}
 }

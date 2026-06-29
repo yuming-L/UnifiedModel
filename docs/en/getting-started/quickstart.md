@@ -23,6 +23,8 @@ Choose a path:
 
 Sample assets: [examples/quickstart-multidomain](../../../examples/quickstart-multidomain/README.md).
 
+Power operations demo: [examples/power-trusted-workspace](../../../examples/power-trusted-workspace/README.md). Use `make power-demo` to start a power-focused workspace with topology, telemetry, model assets, and runbook guidance.
+
 API-only startup:
 
 ```bash

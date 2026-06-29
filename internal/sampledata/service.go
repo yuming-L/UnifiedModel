@@ -17,6 +17,8 @@ import (
 
 const (
 	MultiDomainQuickStartSample = "multi-domain-quickstart"
+	PowerTrustedWorkspaceSample = "power-trusted-workspace"
+	PowerDemoSample             = "power-demo"
 )
 
 type sampleDefinition struct {
@@ -48,6 +50,13 @@ var sampleCatalog = []sampleDefinition{
 		SchemaRoot:   "examples/service-localization",
 		EntityFile:   "examples/service-localization/sample-data/entities.json",
 		RelationFile: "examples/service-localization/sample-data/relations.json",
+	},
+	{
+		Name:         PowerTrustedWorkspaceSample,
+		Aliases:      []string{PowerDemoSample, "power-trusted", "trusted-workspace", "power trusted workspace", "examples/power-trusted-workspace"},
+		SchemaRoot:   "examples/power-trusted-workspace",
+		EntityFile:   "examples/power-trusted-workspace/sample-data/entities.json",
+		RelationFile: "examples/power-trusted-workspace/sample-data/relations.json",
 	},
 }
 

@@ -1,0 +1,27 @@
+kind: prometheus
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.prometheus.core"
+  domain: power
+  display_name:
+    en_us: "Power Prometheus"
+    zh_cn: "电力指标 Prometheus"
+  description:
+    en_us: "Prometheus-compatible endpoint for power device telemetry planning."
+    zh_cn: "用于电力设备遥测规划的 Prometheus 兼容端点。"
+spec:
+  endpoint: "http://prometheus.power.example:9090"
+  api_prefix: "/api/v1"
+  default_query_type: range
+  default_step: 1m
+  lookback_delta: 5m
+  tenant: power-trusted-workspace
+  tenant_header: "X-Scope-OrgID"
+  tls_verify: true
+  external_labels:
+    workspace: power-trusted-workspace
+  tags:
+    sample: power-trusted-workspace
+    role: metrics

@@ -23,6 +23,8 @@ GO_TAGS ?= $(if $(filter local.ladybug,$(GRAPHSTORE)),ladybug,)
 QUICKSTART ?= 0
 QUICKSTART_WORKSPACE ?= demo
 QUICKSTART_SAMPLE ?= multi-domain-quickstart
+POWER_DEMO_WORKSPACE ?= power-demo
+POWER_DEMO_SAMPLE ?= power-trusted-workspace
 FORCE ?= 0
 DRY_RUN ?= 0
 PID_DIR ?= .run
@@ -42,6 +44,7 @@ help:
 	@echo "  test-ui                Type-check and build the web UI"
 	@echo "  dev                    Start API and web dev server in the background"
 	@echo "  quickstart             Start API and web dev server with bundled demo data preloaded"
+	@echo "  power-demo             Start API and web dev server with the power trusted workspace demo"
 	@echo "  deploy                 Build UI and start the production-style server in the background"
 	@echo "  status                 Show local dev/deploy process, port, and health status"
 	@echo "  stop-all               Stop local API, web dev, and deploy servers"
@@ -73,6 +76,7 @@ help:
 	@echo "Dev options:"
 	@echo "  make dev defaults to GRAPHSTORE=file.memory DATA_ROOT=data with controlled Cypher enabled"
 	@echo "  make quickstart loads QUICKSTART_WORKSPACE=demo and QUICKSTART_SAMPLE=multi-domain-quickstart into GRAPHSTORE=memory"
+	@echo "  make power-demo loads POWER_DEMO_WORKSPACE=power-demo and POWER_DEMO_SAMPLE=power-trusted-workspace into GRAPHSTORE=memory"
 	@echo "  GRAPHSTORE=file.memory DATA_ROOT=data make dev"
 	@echo "  GRAPHSTORE=memory GO_TAGS= DATA_ROOT=data make dev"
 	@echo "  GO_TAGS=ladybug GRAPHSTORE=local.ladybug DATA_ROOT=data make dev"
@@ -106,6 +110,12 @@ dev:
 quickstart: GRAPHSTORE = memory
 quickstart: QUICKSTART = 1
 quickstart: dev
+
+power-demo: GRAPHSTORE = memory
+power-demo: QUICKSTART = 1
+power-demo: QUICKSTART_WORKSPACE = $(POWER_DEMO_WORKSPACE)
+power-demo: QUICKSTART_SAMPLE = $(POWER_DEMO_SAMPLE)
+power-demo: dev
 
 deploy: GRAPHSTORE = file.memory
 deploy: build-ui

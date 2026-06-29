@@ -1,0 +1,30 @@
+kind: runbook_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device_to_power.device.ops"
+  domain: power
+  display_name:
+    en_us: "Device to Device Operations Runbook"
+    zh_cn: "设备 → 设备运维手册"
+  description:
+    en_us: "Links power devices to the operations runbook with field-to-parameter mapping for anomaly detection, load forecasting, and backup-duration estimation."
+    zh_cn: "将电力设备链接到运维手册，并把字段映射到异常检测、负载预测和后备时长估算的输入参数。"
+spec:
+  src:
+    domain: power
+    kind: entity_set
+    name: power.device
+  dest:
+    domain: power
+    kind: runbook_set
+    name: power.device.ops
+  token_replace:
+    device_id: "${__entity_id__}"
+    device_name: "${display_name}"
+    device_owner: "${owner}"
+  fields_mapping:
+    id: device_id
+    display_name: device_name
+    owner: device_owner

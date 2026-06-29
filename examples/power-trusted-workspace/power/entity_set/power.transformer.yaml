@@ -1,0 +1,38 @@
+kind: entity_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v0.1.0"
+metadata:
+  name: "power.transformer"
+  domain: power
+  display_name:
+    en_us: "Transformer"
+    zh_cn: "变压器"
+  description:
+    en_us: "Transformer that steps power down between feeder and device layers."
+    zh_cn: "承接馈线与设备层之间降压关系的变压器。"
+spec:
+  fields:
+    - name: id
+      type: string
+      display_name: { en_us: "ID", zh_cn: "ID" }
+    - name: display_name
+      type: string
+      display_name: { en_us: "Name", zh_cn: "名称" }
+    - name: status
+      type: string
+      display_name: { en_us: "Status", zh_cn: "状态" }
+    - name: capacity_kva
+      type: integer
+      display_name: { en_us: "Capacity kVA", zh_cn: "容量(kVA)" }
+    - name: temperature_c
+      type: integer
+      display_name: { en_us: "Temperature C", zh_cn: "温度(℃)" }
+  primary_key_fields:
+    - id
+  id_generator: "id"
+  name_fields:
+    - display_name
+  ordered_fields: ["id", "display_name", "status", "capacity_kva", "temperature_c"]
+  first_observed_time_field: "__first_observed_time__"
+  last_observed_time_field: "__last_observed_time__"

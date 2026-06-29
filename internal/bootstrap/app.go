@@ -262,7 +262,7 @@ func (a *App) handleRoot(w http.ResponseWriter, r *http.Request) {
 		"endpoints": map[string]string{
 			"health":       "/healthz",
 			"workspaces":   "/api/v1/workspaces",
-			"samples":      "/api/v1/samples/{workspace}/multi-domain-quickstart:import",
+			"samples":      "/api/v1/samples/{workspace}/{sample}:import",
 			"query":        "/api/v1/query/{workspace}/execute",
 			"queryExplain": "/api/v1/query/{workspace}/explain",
 			"agent":        "/api/v1/agent/{workspace}/discover",

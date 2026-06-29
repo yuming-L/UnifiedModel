@@ -94,7 +94,6 @@ export function EntityTopoPage({
   const [selected, setSelected] = useState<TopoSelection | null>(null)
   const [zoomLevel, setZoomLevel] = useState<TopoZoomLevel>('full')
   const searchBlurRef = useRef<number | null>(null)
-  const { t } = useI18n()
 
   const load = useCallback(async (range = queryTimeRange) => {
     setLoading(true)
@@ -188,17 +187,10 @@ export function EntityTopoPage({
     <div className="eto-root">
       <aside className="eto-sidebar">
         <div className="eto-sidebar-tabs">
-<<<<<<< HEAD
-          <button className={sidebarTab === 'summary' ? 'active' : ''} onClick={() => setSidebarTab('summary')} type="button" title={t('topo.summary')}>
-            <Layers size={15} />
-          </button>
-          <button className={sidebarTab === 'display' ? 'active' : ''} onClick={() => setSidebarTab('display')} type="button" title={t('topo.displayTab')}>
-=======
           <button className={sidebarTab === 'summary' ? 'active' : ''} onClick={() => setSidebarTab('summary')} type="button" title={t('entityTopoExplorer.tabs.summary')}>
             <Layers size={15} />
           </button>
           <button className={sidebarTab === 'display' ? 'active' : ''} onClick={() => setSidebarTab('display')} type="button" title={t('entityTopoExplorer.tabs.display')}>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             <Settings2 size={15} />
           </button>
         </div>
@@ -295,39 +287,22 @@ export function EntityTopoPage({
 
         <div className="eto-content-area">
           <main className="eto-canvas-panel">
-<<<<<<< HEAD
-            {loading && data.nodes.length === 0 && <div className="eto-loading"><Activity size={16} /> Loading topology...</div>}
-            {loading && data.nodes.length > 0 && <div className="eto-floating-badge">{t('app.refresh')}</div>}
-            {!loading && error && (
-              <div className="eto-empty-wrap">
-                <EmptyState title={t('topo.queryFailed')} detail={error} action={<Button onClick={() => void load(queryTimeRange)}><RefreshCcw size={15} />{t('topo.retry')}</Button>} />
-=======
             {loading && data.nodes.length === 0 && <div className="eto-loading"><Activity size={16} /> {t('entityTopoExplorer.loading.topology')}</div>}
             {loading && data.nodes.length > 0 && <div className="eto-floating-badge">{t('entityTopoExplorer.loading.refreshing')}</div>}
             {!loading && error && (
               <div className="eto-empty-wrap">
                 <EmptyState title={t('entityTopoExplorer.empty.queryFailed')} detail={error} action={<Button onClick={() => void load(queryTimeRange)}><RefreshCcw size={15} />{t('entityTopoExplorer.action.retry')}</Button>} />
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
               </div>
             )}
             {!loading && !error && data.nodes.length === 0 && (
               <div className="eto-empty-wrap">
                 <EmptyState
-<<<<<<< HEAD
-                  title={t('topo.noData')}
-                  detail={t('topo.importSampleDetail')}
-                  action={
-                    <Button variant="primary" disabled={sampleImporting} onClick={() => void importSample()}>
-                      <Sparkles size={15} />
-                      {sampleImporting ? t('topo.importingSample') : t('topo.importSample')}
-=======
                   title={t('entityTopoExplorer.empty.noData.title')}
                   detail={t('entityTopoExplorer.empty.noData.detail')}
                   action={
                     <Button variant="primary" disabled={sampleImporting} onClick={() => void importSample()}>
                       <Sparkles size={15} />
                       {sampleImporting ? t('entityTopoExplorer.action.importingSample') : t('entityTopoExplorer.action.importQuickstartSample')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                     </Button>
                   }
                 />
@@ -336,15 +311,9 @@ export function EntityTopoPage({
             {!loading && !error && data.nodes.length > 0 && filteredData.nodes.length === 0 && (
               <div className="eto-empty-wrap">
                 <EmptyState
-<<<<<<< HEAD
-                  title={t('topo.noMatchingEntities')}
-                  detail={t('topo.clearFiltersDetail')}
-                    action={<Button variant="primary" onClick={clearFilters}><FilterX size={15} />{t('topo.clearFilters')}</Button>}
-=======
                   title={t('entityTopoExplorer.empty.noMatching.title')}
                   detail={t('entityTopoExplorer.empty.noMatching.detail')}
                   action={<Button variant="primary" onClick={clearFilters}><FilterX size={15} />{t('entityTopoExplorer.action.clearFilters')}</Button>}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                 />
               </div>
             )}
@@ -371,15 +340,9 @@ export function EntityTopoPage({
         </div>
 
         <footer className="eto-statusbar">
-<<<<<<< HEAD
-          <span><strong>{filteredData.nodes.length.toLocaleString()}</strong> {t('topo.entities')}</span>
-          <span className="eto-status-sep" />
-          <span><strong>{filteredData.edges.length.toLocaleString()}</strong> {t('topo.relations')}</span>
-=======
           <span><strong>{filteredData.nodes.length.toLocaleString()}</strong> {t('entityTopoExplorer.status.entities')}</span>
           <span className="eto-status-sep" />
           <span><strong>{filteredData.edges.length.toLocaleString()}</strong> {t('entityTopoExplorer.status.relations')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
           {data.limitInfo.reached && (
             <>
               <span className="eto-status-sep" />

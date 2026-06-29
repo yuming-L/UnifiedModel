@@ -6,11 +6,7 @@ import { Brand, HealthBadge } from '../../App'
 import { Button, Badge, IconButton } from '../../design/components'
 import { useI18n, type MessageKey } from '../../i18n'
 import { formatError } from '../../lib/json'
-<<<<<<< HEAD
-import { useI18n } from '../../i18n'
-=======
 import type { WorkspaceView } from '../../routes'
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 const UModelPage = lazy(() => import('../umodel/UModelPage').then(({ UModelPage }) => ({ default: UModelPage })))
 const EntityTopoPage = lazy(() => import('../entityTopo/EntityTopoPage').then(({ EntityTopoPage }) => ({ default: EntityTopoPage })))
@@ -48,11 +44,10 @@ export function WorkspaceShell({
   onHealthChange: (health: HealthResponse | null) => void
   onBack: () => void
 }) {
-  const { t } = useI18n()
+  const { t, locale, setLocale } = useI18n()
   const [error, setError] = useState('')
   const [refreshToken, setRefreshToken] = useState(0)
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
-  const { t, locale, setLocale } = useI18n()
 
   const refresh = useCallback(async () => {
     setError('')
@@ -116,11 +111,7 @@ export function WorkspaceShell({
           </div>
           <IconButton
             className="workspace-collapse-button"
-<<<<<<< HEAD
-            label={sidebarCollapsed ? t('shell.expandSidebar') : t('shell.collapseSidebar')}
-=======
             label={sidebarCollapsed ? t('nav.expandSidebar') : t('nav.collapseSidebar')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             onClick={() => setSidebarCollapsed((value) => !value)}
             type="button"
           >
@@ -144,11 +135,7 @@ export function WorkspaceShell({
         <div className="workspace-sidebar-footer">
           <Button className="workspace-back-button" variant="ghost" onClick={onBack}>
             <ArrowLeft size={16} />
-<<<<<<< HEAD
-            <span className="workspace-back-label">{t('shell.workspaces')}</span>
-=======
             <span className="workspace-back-label">{t('nav.workspaces')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
           </Button>
           <button
             className="workspace-lang-toggle"
@@ -165,63 +152,28 @@ export function WorkspaceShell({
         {!topbarHidden && (
         <header className="workspace-topbar">
           <div className="row" style={{ minWidth: 0 }}>
-<<<<<<< HEAD
-            <Badge tone="indigo">{viewLabel(view, t)}</Badge>
-            <span className="small muted" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-              {error || workspace?.paths.root || t('shell.loadingMetadata')}
-=======
             <Badge tone="indigo">{t(viewLabelKey(view))}</Badge>
             <span className="small muted" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
               {error || workspace?.paths.root || t('settings.metadata.notLoaded')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </span>
           </div>
           <div className="row">
             <HealthBadge health={health} />
             <Button variant="ghost" onClick={() => void refresh()}>
               <RefreshCcw size={15} />
-<<<<<<< HEAD
-              {t('app.refresh')}
-=======
               {t('common.refresh')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </Button>
           </div>
         </header>
         )}
-<<<<<<< HEAD
-        <main className={`workspace-content ${explorerHost ? 'workspace-content-explorer' : ''}`}>
-          <Suspense fallback={<div className="workspace-page-loading">{t('app.loading')}</div>}>{page}</Suspense>
-=======
         <main className={`workspace-content ${canvasHost ? 'workspace-content-canvas' : ''}`}>
           <Suspense fallback={<div className="workspace-page-loading">{t('common.loading')}</div>}>{page}</Suspense>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
         </main>
       </section>
     </div>
   )
 }
 
-<<<<<<< HEAD
-function viewLabel(view: WorkspaceView, t: (key: string, fallback?: string) => string): string {
-  switch (view) {
-    case 'explorer':
-      return t('nav.explorer')
-    case 'entityTopo':
-      return t('nav.entityTopo')
-    case 'query':
-      return t('nav.query')
-    case 'imports':
-      return t('nav.imports')
-    case 'agent':
-      return t('nav.agent')
-    case 'settings':
-      return t('nav.settings')
-    case 'docs':
-      return t('nav.apiMap')
-    case 'data':
-      return t('nav.dataStore')
-=======
 function viewLabelKey(view: WorkspaceView): MessageKey {
   switch (view) {
     case 'umodel':
@@ -236,7 +188,6 @@ function viewLabelKey(view: WorkspaceView): MessageKey {
       return 'nav.settings'
     case 'apiDebug':
       return 'nav.apiMap'
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
   }
 }
 

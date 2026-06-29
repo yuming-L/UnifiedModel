@@ -1,0 +1,23 @@
+kind: data_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device_related_to_power.device.logs"
+  domain: power
+  display_name:
+    en_us: "Device related to device logs"
+    zh_cn: "设备关联设备日志"
+spec:
+  src:
+    domain: power
+    kind: entity_set
+    name: power.device
+  dest:
+    domain: power
+    kind: log_set
+    name: power.device.logs
+  fields_mapping:
+    id: target_id
+    region: device_type
+  data_link_type: related_to

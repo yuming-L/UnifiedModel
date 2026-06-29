@@ -1,0 +1,22 @@
+kind: data_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.battery_pack_related_to_power.device.metrics"
+  domain: power
+  display_name:
+    en_us: "Battery pack related to device metrics"
+    zh_cn: "蓄电池关联设备指标"
+spec:
+  src:
+    domain: power
+    kind: entity_set
+    name: power.battery_pack
+  dest:
+    domain: power
+    kind: metric_set
+    name: power.device.metrics
+  fields_mapping:
+    id: target_id
+  data_link_type: related_to

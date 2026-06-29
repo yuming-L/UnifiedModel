@@ -1,0 +1,27 @@
+kind: mysql
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.mysql.events"
+  domain: power
+  display_name:
+    en_us: "Power MySQL Events"
+    zh_cn: "电力事件 MySQL"
+  description:
+    en_us: "MySQL endpoint for device events, maintenance records, and evidence audit trails."
+    zh_cn: "用于设备事件、检修记录和证据审计轨迹的 MySQL 端点。"
+spec:
+  endpoint: "mysql.power.example:3306"
+  database: "power_ops"
+  table: "device_events"
+  sql_dialect: mysql
+  time_field: event_time
+  time_unit: second
+  default_limit: 1000
+  max_limit: 10000
+  read_only: true
+  tls_mode: preferred
+  tags:
+    sample: power-trusted-workspace
+    role: events

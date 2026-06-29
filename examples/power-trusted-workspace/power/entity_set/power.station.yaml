@@ -1,0 +1,41 @@
+kind: entity_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v0.1.0"
+metadata:
+  name: "power.station"
+  domain: power
+  display_name:
+    en_us: "Power Station"
+    zh_cn: "变电站"
+  description:
+    en_us: "A governed power station node that anchors the electrical topology and operational context."
+    zh_cn: "承载供电拓扑和运维上下文的受管变电站节点。"
+spec:
+  fields:
+    - name: id
+      type: string
+      display_name: { en_us: "ID", zh_cn: "ID" }
+    - name: display_name
+      type: string
+      display_name: { en_us: "Name", zh_cn: "名称" }
+    - name: status
+      type: string
+      display_name: { en_us: "Status", zh_cn: "状态" }
+    - name: voltage_level
+      type: string
+      display_name: { en_us: "Voltage Level", zh_cn: "电压等级" }
+    - name: owner
+      type: string
+      display_name: { en_us: "Owner", zh_cn: "责任人" }
+    - name: region
+      type: string
+      display_name: { en_us: "Region", zh_cn: "区域" }
+  primary_key_fields:
+    - id
+  id_generator: "id"
+  name_fields:
+    - display_name
+  ordered_fields: ["id", "display_name", "status", "voltage_level", "owner", "region"]
+  first_observed_time_field: "__first_observed_time__"
+  last_observed_time_field: "__last_observed_time__"

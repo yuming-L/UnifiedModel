@@ -23,6 +23,8 @@ Quickstart 使用 `GRAPHSTORE=memory` 预加载 `demo` workspace。进程停止�
 
 样例资产：[examples/quickstart-multidomain](../../../examples/quickstart-multidomain/README.zh-CN.md)。
 
+电力运维示例包：[examples/power-trusted-workspace](../../../examples/power-trusted-workspace/README.zh-CN.md)。运行 `make power-demo` 可以直接打开面向电力拓扑、遥测、模型和运维手册的可信工作区。
+
 仅启动 API：
 
 ```bash

@@ -1,0 +1,62 @@
+kind: metric_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device.metrics"
+  domain: power
+  display_name:
+    en_us: "Power Device Metrics"
+    zh_cn: "电力设备指标"
+  description:
+    en_us: "Telemetry metrics for device load, voltage, temperature, and backup duration."
+    zh_cn: "覆盖负载、电压、温度和后备时长的电力设备遥测指标。"
+spec:
+  labels:
+    keys:
+      - name: target_id
+        type: string
+        display_name: { en_us: "Target ID", zh_cn: "目标ID" }
+      - name: environment
+        type: string
+        display_name: { en_us: "Environment", zh_cn: "环境" }
+    dynamic: false
+  metrics:
+    - name: load_pct
+      display_name: { en_us: "Load %", zh_cn: "负载%" }
+      unit: percent
+      data_format: percent
+      type: gauge
+      query_mode: range
+      generator: "avg(power_device_load_pct{target_id=\"$target_id\"})"
+      aggregator: avg
+      golden_metric: true
+    - name: voltage
+      display_name: { en_us: "Voltage", zh_cn: "电压" }
+      unit: kv
+      data_format: KMB
+      type: gauge
+      query_mode: range
+      generator: "avg(power_device_voltage_kv{target_id=\"$target_id\"})"
+      aggregator: avg
+      golden_metric: true
+    - name: temperature_c
+      display_name: { en_us: "Temperature C", zh_cn: "温度(℃)" }
+      unit: celsius
+      data_format: KMB
+      type: gauge
+      query_mode: range
+      generator: "avg(power_device_temperature_c{target_id=\"$target_id\"})"
+      aggregator: avg
+      golden_metric: true
+    - name: backup_minutes
+      display_name: { en_us: "Backup Minutes", zh_cn: "后备分钟数" }
+      unit: minute
+      data_format: m
+      type: gauge
+      query_mode: range
+      generator: "avg(power_battery_backup_minutes{target_id=\"$target_id\"})"
+      aggregator: avg
+      golden_metric: true
+  query_type: prom
+  needs_processing: true

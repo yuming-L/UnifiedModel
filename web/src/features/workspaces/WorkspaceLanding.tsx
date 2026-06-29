@@ -45,11 +45,7 @@ import { ApiError, UModelApi } from '../../api/client'
 import { formatError, parseJson } from '../../lib/json'
 import { Brand, HealthBadge } from '../../App'
 import { Badge, Button, EmptyState, Field, JsonEditor, Modal, TextInput } from '../../design/components'
-<<<<<<< HEAD
-import { useI18n } from '../../i18n'
-=======
 import { LanguageSelect, useI18n, type MessageKey, type TFunction } from '../../i18n'
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 export function WorkspaceLanding({
   api,
@@ -66,7 +62,7 @@ export function WorkspaceLanding({
   onHealthChange: (value: HealthResponse | null) => void
   onOpenWorkspace: (workspace: WorkspaceMetadata) => void
 }) {
-  const { t } = useI18n()
+  const { t, locale, setLocale } = useI18n()
   const [workspaces, setWorkspaces] = useState<WorkspaceMetadata[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -75,7 +71,6 @@ export function WorkspaceLanding({
   const [testingEndpoint, setTestingEndpoint] = useState(false)
   const [endpointHelpPosition, setEndpointHelpPosition] = useState<{ left: number; top: number } | null>(null)
   const endpointHelpButtonRef = useRef<HTMLButtonElement | null>(null)
-  const { t, locale, setLocale } = useI18n()
 
   useEffect(() => {
     setEndpointDraft(apiBase)
@@ -151,32 +146,17 @@ export function WorkspaceLanding({
     [displayedWorkspaces],
   )
   const apiEndpointSummary = useMemo(() => summarizeApiEndpoint(apiBase, t), [apiBase, t])
-<<<<<<< HEAD
-  const [flowNodes, , onFlowNodesChange] = useNodesState(useMemo(() => getLandingFlowNodes(t), [t]))
-=======
   const [flowNodes, , onFlowNodesChange] = useNodesState(landingFlowNodes)
   const activeWorkspaceCountText = activeCount === 1
     ? t('landing.workspaces.activeCount.one', { count: activeCount })
     : t('landing.workspaces.activeCount.other', { count: activeCount })
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
   return (
     <div className="landing app-shell">
       <header className="landing-topbar">
         <Brand />
         <div className="landing-topbar-actions">
-<<<<<<< HEAD
-          <button
-            className="landing-lang-toggle"
-            onClick={() => setLocale(locale === 'zh-CN' ? 'en' : 'zh-CN')}
-            type="button"
-            title={locale === 'zh-CN' ? 'Switch to English' : '切换为中文'}
-          >
-            {locale === 'zh-CN' ? 'EN' : '中'}
-          </button>
-=======
           <LanguageSelect showLabel={false} />
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
           <HealthBadge health={health} />
         </div>
       </header>
@@ -185,50 +165,30 @@ export function WorkspaceLanding({
         <section className="landing-workspace-panel" aria-label={t('landing.aria.workspaceControls')}>
           <div className="landing-copy">
             <h1>
-<<<<<<< HEAD
-              {t('landing.title')} <span className="landing-gradient-text">{t('landing.titleHighlight')}</span>{t('landing.titleSuffix')}
-            </h1>
-            <p>
-              {t('landing.description')}
-            </p>
-=======
               {t.rich('landing.hero.title', {
                 highlight: (chunks) => <span className="landing-gradient-text">{chunks}</span>,
               })}
             </h1>
             <p>{t('landing.hero.description')}</p>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
           </div>
 
           <div className="landing-actions">
             <Button variant="primary" onClick={() => setCreateOpen(true)}>
               <FolderPlus size={16} />
-<<<<<<< HEAD
-              {t('landing.createWorkspace')}
-=======
               {t('landing.actions.createWorkspace')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </Button>
           </div>
 
           <div className="landing-api-card">
             <div className="om-field">
               <span className="om-label landing-api-label-row">
-<<<<<<< HEAD
-                <span>{t('app.apiEndpoint')}</span>
-=======
                 <span>{t('landing.api.endpoint')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                 <span className="landing-help-wrap" onMouseEnter={showEndpointHelp} onMouseLeave={hideEndpointHelp}>
                   <button
                     ref={endpointHelpButtonRef}
                     className="landing-help-trigger"
                     type="button"
-<<<<<<< HEAD
-                    aria-label={t('landing.examples')}
-=======
                     aria-label={t('landing.api.helpLabel')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                     aria-describedby={endpointHelpPosition ? 'landing-endpoint-help' : undefined}
                     onFocus={showEndpointHelp}
                     onBlur={hideEndpointHelp}
@@ -248,24 +208,6 @@ export function WorkspaceLanding({
                         '--tooltip-top': `${endpointHelpPosition.top}px`,
                       } as CSSProperties}
                     >
-<<<<<<< HEAD
-                      <strong>{t('landing.examples')}</strong>
-                      <span className="landing-help-line">
-                        <b>{t('landing.backend')}</b>
-                        <code>http://localhost:8080</code>
-                      </span>
-                      <span className="landing-help-line">
-                        <b>{t('landing.backend')}</b>
-                        <code>http://127.0.0.1:8080</code>
-                      </span>
-                      <span className="landing-help-line">
-                        <b>{t('landing.devProxy')}</b>
-                        <code>http://127.0.0.1:5173</code>
-                      </span>
-                      <span className="landing-help-line">
-                        <b>{t('landing.blank')}</b>
-                        <span>{t('landing.blankHint')}</span>
-=======
                       <strong>{t('landing.api.examples')}</strong>
                       <span className="landing-help-line">
                         <b>{t('landing.api.backend')}</b>
@@ -282,7 +224,6 @@ export function WorkspaceLanding({
                       <span className="landing-help-line">
                         <b>{t('landing.api.blank')}</b>
                         <span>{t('landing.api.blankDetail')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                       </span>
                     </span>,
                     document.body,
@@ -298,47 +239,22 @@ export function WorkspaceLanding({
                 <TextInput
                   value={endpointDraft}
                   onChange={(event) => setEndpointDraft(event.target.value)}
-<<<<<<< HEAD
-                  placeholder={t('app.sameOrigin')}
-                  spellCheck={false}
-                />
-                <Button type="submit" variant={endpointChanged ? 'primary' : 'secondary'} disabled={testingEndpoint}>
-                  {testingEndpoint ? t('landing.checking') : t('landing.connect')}
-=======
                   placeholder={t('landing.api.placeholder')}
                   spellCheck={false}
                 />
                 <Button type="submit" variant={endpointChanged ? 'primary' : 'secondary'} disabled={testingEndpoint}>
                   {testingEndpoint ? t('landing.api.checking') : t('landing.api.connect')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                 </Button>
               </form>
             </div>
             <div className="landing-inline-note">
               <Database size={14} />
-<<<<<<< HEAD
-              {endpointChanged ? t('landing.notApplied') : t('landing.connectedEndpoint')}
-=======
               {endpointChanged ? t('landing.api.changedNote') : t('landing.api.connectedNote')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </div>
           </div>
 
           <div className="landing-metrics">
             <div>
-<<<<<<< HEAD
-              <span>{t('landing.workspaces')}</span>
-              <strong>{displayedWorkspaces.length}</strong>
-              <small><StatusDotLike /> {activeCount} {t('landing.active')}</small>
-            </div>
-            <div>
-              <span>{t('landing.graphstore')}</span>
-              <strong>{health?.graphstore.provider || t('app.unknown')}</strong>
-              <small>{health ? <><StatusDotLike /> {t('landing.connected')}</> : <><Cable size={12} /> {t('landing.notConnected')}</>}</small>
-            </div>
-            <div>
-              <span>{t('landing.api')}</span>
-=======
               <span>{t('landing.metrics.workspaces')}</span>
               <strong>{displayedWorkspaces.length}</strong>
               <small><StatusDotLike /> {t('landing.metrics.active', { count: activeCount })}</small>
@@ -350,7 +266,6 @@ export function WorkspaceLanding({
             </div>
             <div>
               <span>{t('landing.metrics.api')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
               <strong className="landing-api-metric-value" title={apiEndpointSummary.full}>
                 {apiEndpointSummary.title}
               </strong>
@@ -361,11 +276,7 @@ export function WorkspaceLanding({
           {error && (
             <div className="om-panel">
               <div className="om-panel-body">
-<<<<<<< HEAD
-                <Badge tone="danger">{t('landing.connectionError')}</Badge>
-=======
                 <Badge tone="danger">{t('landing.error.connection')}</Badge>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                 <p className="small muted">{error}</p>
               </div>
             </div>
@@ -374,21 +285,12 @@ export function WorkspaceLanding({
           <div className="landing-workspace-list-card">
             <div className="landing-section-head">
               <div>
-<<<<<<< HEAD
-                <strong>{t('landing.recentWorkspaces')}</strong>
-                <span>{activeCount} {t('landing.activeWorkspace')}{activeCount === 1 ? '' : 's'}</span>
-              </div>
-              <Button variant="ghost" size="sm" onClick={() => void refresh()}>
-                <RefreshCcw size={14} />
-                {t('app.refresh')}
-=======
                 <strong>{t('landing.workspaces.recent')}</strong>
                 <span>{activeWorkspaceCountText}</span>
               </div>
               <Button variant="ghost" size="sm" onClick={() => void refresh()}>
                 <RefreshCcw size={14} />
                 {t('common.refresh')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
               </Button>
             </div>
 
@@ -396,21 +298,6 @@ export function WorkspaceLanding({
               {endpointChanged && !testingEndpoint && (
                 <div className="landing-connect-placeholder">
                   <Database size={18} />
-<<<<<<< HEAD
-                  <strong>{t('landing.endpointNotConnected')}</strong>
-                  <span>{t('landing.clickConnect')}</span>
-                </div>
-              )}
-              {loading && !endpointChanged && <div className="landing-list-note">{t('landing.loadingWorkspaces')}</div>}
-              {!loading && !endpointChanged && displayedWorkspaces.length === 0 && (
-                <EmptyState
-                  title={t('landing.noWorkspaces')}
-                  detail={t('landing.noWorkspacesDetail')}
-                  action={
-                    <Button variant="primary" onClick={() => setCreateOpen(true)}>
-                      <FolderPlus size={16} />
-                      {t('landing.createWorkspace')}
-=======
                   <strong>{t('landing.workspaces.endpointNotConnected.title')}</strong>
                   <span>{t('landing.workspaces.endpointNotConnected.detail')}</span>
                 </div>
@@ -424,7 +311,6 @@ export function WorkspaceLanding({
                     <Button variant="primary" onClick={() => setCreateOpen(true)}>
                       <FolderPlus size={16} />
                       {t('landing.actions.createWorkspace')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
                     </Button>
                   }
                 />
@@ -460,7 +346,7 @@ export function WorkspaceLanding({
               <ReactFlow
                 className="landing-react-flow"
                 nodes={flowNodes}
-                edges={useMemo(() => getLandingFlowEdges(t), [t])}
+                edges={landingFlowEdges}
                 nodeTypes={landingFlowNodeTypes}
                 edgeTypes={landingFlowEdgeTypes}
                 defaultViewport={{ x: 0, y: 0, zoom: 1 }}
@@ -533,137 +419,6 @@ const landingFlowTones: Record<LandingFlowTone, { solid: string; soft: string; t
   slate: { solid: '#61708c', soft: 'rgba(97, 112, 140, 0.12)', text: '#36445e' },
 }
 
-<<<<<<< HEAD
-function getLandingFlowNodes(t: (key: string, fallback?: string) => string): Node<LandingFlowNodeData>[] {
-  return [
-    {
-      id: 'workspace',
-      type: 'landing',
-      position: { x: 430, y: 18 },
-      data: {
-        icon: 'workspace',
-        kind: 'Workspace',
-        title: t('landing.flow.workspace'),
-        subtitle: t('landing.flow.workspaceSub'),
-        meta: 'memory',
-        tone: 'slate',
-        variant: 'source',
-        width: 286,
-        details: t('landing.flow.workspaceDetails').split(', '),
-      },
-    },
-    {
-      id: 'schema',
-      type: 'landing',
-      position: { x: 36, y: 226 },
-      data: {
-        icon: 'schema',
-        kind: 'Schema',
-        title: t('landing.flow.schema'),
-        subtitle: t('landing.flow.schemaSub'),
-        meta: 'design',
-        tone: 'violet',
-        variant: 'schema',
-        width: 274,
-        details: t('landing.flow.schemaDetails').split(', '),
-      },
-    },
-    {
-      id: 'adapters',
-      type: 'landing',
-      position: { x: 44, y: 542 },
-      data: {
-        icon: 'database',
-        kind: 'Evidence',
-        title: t('landing.flow.adapters'),
-        subtitle: t('landing.flow.adaptersSub'),
-        meta: 'live',
-        tone: 'blue',
-        variant: 'adapter',
-        width: 286,
-        details: t('landing.flow.adaptersDetails').split(', '),
-      },
-    },
-    {
-      id: 'graph',
-      type: 'landing',
-      position: { x: 430, y: 284 },
-      data: {
-        icon: 'service',
-        kind: 'Model Core',
-        title: t('landing.flow.graph'),
-        subtitle: t('landing.flow.graphSub'),
-        meta: 'primary',
-        tone: 'blue',
-        variant: 'core',
-        width: 356,
-        details: t('landing.flow.graphDetails').split(', '),
-      },
-    },
-    {
-      id: 'query',
-      type: 'landing',
-      position: { x: 872, y: 108 },
-      data: {
-        icon: 'query',
-        kind: 'Query',
-        title: t('landing.flow.query'),
-        subtitle: t('landing.flow.querySub'),
-        meta: 'fast',
-        tone: 'aqua',
-        variant: 'query',
-        width: 306,
-        details: t('landing.flow.queryDetails').split(', '),
-      },
-    },
-    {
-      id: 'diff',
-      type: 'landing',
-      position: { x: 906, y: 346 },
-      data: {
-        icon: 'diff',
-        kind: 'Review',
-        title: t('landing.flow.diff'),
-        subtitle: t('landing.flow.diffSub'),
-        meta: '+2 -1',
-        tone: 'amber',
-        variant: 'review',
-        width: 286,
-        details: t('landing.flow.diffDetails').split(', '),
-      },
-    },
-    {
-      id: 'agent',
-      type: 'landing',
-      position: { x: 430, y: 640 },
-      data: {
-        icon: 'agent',
-        kind: 'Agent',
-        title: t('landing.flow.agent'),
-        subtitle: t('landing.flow.agentSub'),
-        meta: 'safe',
-        tone: 'violet',
-        variant: 'agent',
-        width: 310,
-        details: t('landing.flow.agentDetails').split(', '),
-      },
-    },
-    {
-      id: 'submit',
-      type: 'landing',
-      position: { x: 902, y: 666 },
-      data: {
-        icon: 'api',
-        kind: 'OpenAPI',
-        title: t('landing.flow.submit'),
-        subtitle: t('landing.flow.submitSub'),
-        meta: 'POST',
-        tone: 'aqua',
-        variant: 'api',
-        width: 294,
-        details: t('landing.flow.submitDetails').split(', '),
-      },
-=======
 const landingFlowNodes: Node<LandingFlowNodeData>[] = [
   {
     id: 'workspace',
@@ -823,95 +578,10 @@ const landingFlowNodes: Node<LandingFlowNodeData>[] = [
         'landing.flow.api.detail.elements',
         'landing.flow.api.detail.relations',
       ],
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
     },
-  ]
-}
+  }
+]
 
-<<<<<<< HEAD
-function getLandingFlowEdges(t: (key: string, fallback?: string) => string): Edge<LandingFlowEdgeData>[] {
-  return [
-    {
-      id: 'workspace-graph',
-      source: 'workspace',
-      sourceHandle: 'source-bottom',
-      target: 'graph',
-      targetHandle: 'target-top',
-      type: 'landing',
-      animated: true,
-      data: { tone: 'blue', label: t('landing.flow.edge.workspaceState') },
-    },
-    {
-      id: 'schema-graph',
-      source: 'schema',
-      sourceHandle: 'source-right',
-      target: 'graph',
-      targetHandle: 'target-left-upper',
-      type: 'landing',
-      animated: true,
-      data: { tone: 'violet', label: t('landing.flow.edge.validatesModel') },
-    },
-    {
-      id: 'adapters-graph',
-      source: 'adapters',
-      sourceHandle: 'source-right',
-      target: 'graph',
-      targetHandle: 'target-left-lower',
-      type: 'landing',
-      animated: true,
-      data: { tone: 'blue', label: t('landing.flow.edge.syncsEvidence') },
-    },
-    {
-      id: 'graph-query',
-      source: 'graph',
-      sourceHandle: 'source-right-upper',
-      target: 'query',
-      targetHandle: 'target-left',
-      type: 'landing',
-      animated: true,
-      data: { tone: 'aqua', label: t('landing.flow.edge.exploreTopology') },
-    },
-    {
-      id: 'query-diff',
-      source: 'query',
-      sourceHandle: 'source-bottom',
-      target: 'diff',
-      targetHandle: 'target-top',
-      type: 'landing',
-      data: { tone: 'amber', label: t('landing.flow.edge.turnsIntoPatch') },
-    },
-    {
-      id: 'graph-agent',
-      source: 'graph',
-      sourceHandle: 'source-bottom',
-      target: 'agent',
-      targetHandle: 'target-top',
-      type: 'landing',
-      animated: true,
-      data: { tone: 'violet', label: t('landing.flow.edge.toolContext') },
-    },
-    {
-      id: 'diff-submit',
-      source: 'diff',
-      sourceHandle: 'source-bottom',
-      target: 'submit',
-      targetHandle: 'target-top',
-      type: 'landing',
-      animated: true,
-      data: { tone: 'amber', label: t('landing.flow.edge.approvedPatch') },
-    },
-    {
-      id: 'agent-submit',
-      source: 'agent',
-      sourceHandle: 'source-right',
-      target: 'submit',
-      targetHandle: 'target-left',
-      type: 'landing',
-      data: { tone: 'violet', label: t('landing.flow.edge.guardedAction') },
-    },
-  ]
-}
-=======
 const landingFlowEdges: Edge<LandingFlowEdgeData>[] = [
   {
     id: 'workspace-graph',
@@ -992,7 +662,6 @@ const landingFlowEdges: Edge<LandingFlowEdgeData>[] = [
     data: { tone: 'violet', labelKey: 'landing.flow.edge.guardedAction' },
   },
 ]
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 const LandingFlowNode = memo(({ data }: NodeProps<Node<LandingFlowNodeData>>) => {
   const { t } = useI18n()
@@ -1214,19 +883,11 @@ function normalizeApiBase(value: string) {
   return value.trim().replace(/\/+$/, '')
 }
 
-<<<<<<< HEAD
-function summarizeApiEndpoint(value: string, t: (key: string, fallback?: string) => string) {
-  const normalized = normalizeApiBase(value)
-  if (!normalized) {
-    return {
-      title: t('app.sameOrigin'),
-=======
 function summarizeApiEndpoint(value: string, t: TFunction) {
   const normalized = normalizeApiBase(value)
   if (!normalized) {
     return {
       title: t('landing.api.sameOrigin'),
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       detail: '/api proxy',
       full: t('landing.api.sameOriginFull'),
     }
@@ -1267,7 +928,6 @@ function CreateWorkspaceModal({
   const [labels, setLabels] = useState('{\n  "env": "local"\n}')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
-  const { t } = useI18n()
 
   async function submit() {
     setSaving(true)
@@ -1289,50 +949,22 @@ function CreateWorkspaceModal({
 
   return (
     <Modal
-<<<<<<< HEAD
-      title={t('landing.createTitle')}
-=======
       title={t('landing.modal.create.title')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       onClose={onClose}
       footer={
         <div className="toolbar" style={{ width: '100%' }}>
           <div />
           <div className="row">
-<<<<<<< HEAD
-            <Button variant="ghost" onClick={onClose}>{t('landing.createCancel')}</Button>
-            <Button variant="primary" onClick={() => void submit()} disabled={saving || !id.trim()}>
-              <FolderPlus size={16} />
-              {t('landing.createCreate')}
-=======
             <Button variant="ghost" onClick={onClose}>{t('common.cancel')}</Button>
             <Button variant="primary" onClick={() => void submit()} disabled={saving || !id.trim()}>
               <FolderPlus size={16} />
               {t('common.create')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </Button>
           </div>
         </div>
       }
     >
       <div className="stack">
-<<<<<<< HEAD
-        <Field label={t('landing.createIdLabel')}>
-          <TextInput value={id} onChange={(event) => setId(event.target.value)} placeholder="demo" />
-        </Field>
-        <Field label={t('landing.createNameLabel')}>
-          <TextInput value={name} onChange={(event) => setName(event.target.value)} placeholder="Demo" />
-        </Field>
-        <Field label={t('landing.createDescriptionLabel')}>
-          <TextInput value={description} onChange={(event) => setDescription(event.target.value)} />
-        </Field>
-        <Field label={t('settings.labelsJson')}>
-          <JsonEditor value={labels} onChange={setLabels} minHeight={120} />
-        </Field>
-        <div className="small muted">
-          {t('landing.createIdHint')}
-        </div>
-=======
         {error && <div className="landing-create-error">{error}</div>}
         <Field label={t('landing.modal.workspaceId')}>
           <TextInput value={id} onChange={(event) => setId(event.target.value)} placeholder="demo" />
@@ -1347,7 +979,6 @@ function CreateWorkspaceModal({
           <JsonEditor value={labels} onChange={setLabels} minHeight={120} />
         </Field>
         <div className="small muted">{t('landing.modal.idHelp')}</div>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       </div>
     </Modal>
   )

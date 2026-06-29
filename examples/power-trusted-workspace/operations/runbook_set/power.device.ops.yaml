@@ -1,0 +1,125 @@
+kind: runbook_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device.ops"
+  domain: power
+  display_name:
+    en_us: "Power Device Operations Runbook"
+    zh_cn: "电力设备运维手册"
+  description:
+    en_us: "Runbook for anomaly detection, load forecasting, and battery backup duration analysis."
+    zh_cn: "覆盖异常检测、负载预测和蓄电池后备时长分析的运维手册。"
+spec:
+  observations:
+    - name: anomaly_detection
+      display_name: { en_us: "Anomaly Detection", zh_cn: "异常检测" }
+      short_description:
+        en_us: "Check whether voltage, temperature, or load signals drift beyond safe bands."
+        zh_cn: "检查电压、温度、负载是否偏离安全阈值。"
+      phenomenon:
+        phenomenon_type: query
+        inputs:
+          - name: device_id
+            display_name: { en_us: "Device ID", zh_cn: "设备ID" }
+            type: string
+            required: true
+          - name: lookback
+            display_name: { en_us: "Lookback", zh_cn: "回看窗口" }
+            type: string
+            required: false
+            default: "24h"
+        properties:
+          metric_query: ".entity_set with(domain='power', name='power.device', ids=['${device_id}']) | entity-call get_metrics('power', 'power.device.metrics', 'voltage', step='5m')"
+      conclusions:
+        - condition_type: prompt
+          condition: "If voltage is unstable, temperature is rising, or load is above the safe band, classify as anomaly."
+          severity: warning
+          display_name: { en_us: "Abnormal Signal Detected", zh_cn: "发现异常信号" }
+          short_description:
+            en_us: "The device shows unsafe telemetry movement."
+            zh_cn: "设备遥测信号已偏离安全区间。"
+          group: "anomaly"
+
+    - name: load_forecast
+      display_name: { en_us: "Load Forecast", zh_cn: "负载预测" }
+      short_description:
+        en_us: "Estimate next-period load using the attached forecast model and recent telemetry."
+        zh_cn: "使用挂载的预测模型和近期遥测估算下一周期负载。"
+      phenomenon:
+        phenomenon_type: query
+        inputs:
+          - name: device_id
+            display_name: { en_us: "Device ID", zh_cn: "设备ID" }
+            type: string
+            required: true
+        properties:
+          model_ref: "power.model_registry"
+          metric_query: ".entity_set with(domain='power', name='power.device', ids=['${device_id}']) | entity-call get_metrics('power', 'power.device.metrics', 'load_pct', step='15m')"
+      conclusions:
+        - condition_type: prompt
+          condition: "If forecasted load exceeds 85%, recommend load balancing or inspection."
+          severity: error
+          display_name: { en_us: "Load Pressure", zh_cn: "负载压力" }
+          short_description:
+            en_us: "The forecast indicates a high load period."
+            zh_cn: "预测显示后续周期负载偏高。"
+          group: "forecast"
+
+    - name: backup_duration
+      display_name: { en_us: "Backup Duration", zh_cn: "后备时长" }
+      short_description:
+        en_us: "Estimate battery backup duration and decide whether the device can survive an outage."
+        zh_cn: "估算蓄电池后备时长，判断设备是否能支撑断电。"
+      phenomenon:
+        phenomenon_type: query
+        inputs:
+          - name: battery_id
+            display_name: { en_us: "Battery ID", zh_cn: "蓄电池ID" }
+            type: string
+            required: true
+        properties:
+          battery_metric_query: ".entity_set with(domain='power', name='power.battery_pack', ids=['${battery_id}']) | entity-call get_metrics('power', 'power.device.metrics', 'backup_minutes', step='15m')"
+      conclusions:
+        - condition_type: prompt
+          condition: "If backup minutes are below the required threshold, escalate immediately."
+          severity: fatal
+          display_name: { en_us: "Backup Insufficient", zh_cn: "后备不足" }
+          short_description:
+            en_us: "Backup duration is not enough for outage tolerance."
+            zh_cn: "后备时长不足以支撑断电容错。"
+          group: "backup"
+  knowledge:
+    - name: battery_maintenance_guide
+      display_name:
+        en_us: "Battery Maintenance Guide"
+        zh_cn: "蓄电池维护指南"
+      short_description:
+        en_us: "Operational guidance for battery capacity, aging, and replacement."
+        zh_cn: "关于电池容量、老化与更换的运维指南。"
+      apply_policy:
+        apply_type: auto
+      content_type: markdown
+      content: |
+        # Battery Maintenance Guide
+
+        - Track backup minutes and SOC together.
+        - Treat sustained temperature rise as a battery health risk.
+        - Recalculate backup duration after configuration or load changes.
+    - name: anomaly_response_playbook
+      display_name:
+        en_us: "Anomaly Response Playbook"
+        zh_cn: "异常响应手册"
+      short_description:
+        en_us: "First-response steps for voltage, load, and temperature anomalies."
+        zh_cn: "电压、负载和温度异常的首响应步骤。"
+      apply_policy:
+        apply_type: auto
+      content_type: markdown
+      content: |
+        # Anomaly Response
+
+        1. Verify the device topology path.
+        2. Check the latest telemetry against the safe band.
+        3. Inspect battery backup duration before any control action.

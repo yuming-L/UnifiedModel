@@ -1,0 +1,38 @@
+kind: entity_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v0.1.0"
+metadata:
+  name: "power.battery_pack"
+  domain: power
+  display_name:
+    en_us: "Battery Pack"
+    zh_cn: "蓄电池组"
+  description:
+    en_us: "Backup battery pack used for outage tolerance and backup-duration estimation."
+    zh_cn: "用于断电容错和后备时长估算的蓄电池组。"
+spec:
+  fields:
+    - name: id
+      type: string
+      display_name: { en_us: "ID", zh_cn: "ID" }
+    - name: display_name
+      type: string
+      display_name: { en_us: "Name", zh_cn: "名称" }
+    - name: status
+      type: string
+      display_name: { en_us: "Status", zh_cn: "状态" }
+    - name: backup_minutes
+      type: integer
+      display_name: { en_us: "Backup Minutes", zh_cn: "后备分钟数" }
+    - name: soc_pct
+      type: integer
+      display_name: { en_us: "SOC %", zh_cn: "荷电状态%" }
+  primary_key_fields:
+    - id
+  id_generator: "id"
+  name_fields:
+    - display_name
+  ordered_fields: ["id", "display_name", "status", "backup_minutes", "soc_pct"]
+  first_observed_time_field: "__first_observed_time__"
+  last_observed_time_field: "__last_observed_time__"

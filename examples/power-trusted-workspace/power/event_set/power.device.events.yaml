@@ -1,0 +1,40 @@
+kind: event_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device.events"
+  domain: power
+  display_name:
+    en_us: "Power Device Events"
+    zh_cn: "电力设备事件"
+  description:
+    en_us: "Alarm and state transition events for device and battery operations."
+    zh_cn: "设备与蓄电池操作相关的告警和状态切换事件。"
+spec:
+  fields:
+    - name: event_time
+      type: time
+      display_name: { en_us: "Event Time", zh_cn: "事件时间" }
+    - name: target_id
+      type: string
+      display_name: { en_us: "Target ID", zh_cn: "目标ID" }
+    - name: event_type
+      type: string
+      display_name: { en_us: "Event Type", zh_cn: "事件类型" }
+    - name: severity
+      type: string
+      display_name: { en_us: "Severity", zh_cn: "严重级别" }
+    - name: detail
+      type: string
+      display_name: { en_us: "Detail", zh_cn: "详情" }
+  time_field: event_time
+  name_fields:
+    - event_type
+    - detail
+  tag_fields:
+    - target_id
+    - event_type
+    - severity
+  ordered_fields: ["event_time", "target_id", "event_type", "severity", "detail"]
+  default_order: desc

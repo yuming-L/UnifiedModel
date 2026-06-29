@@ -1,0 +1,20 @@
+kind: entity_set_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device_registered_as_power.model_registry"
+  domain: power
+  display_name:
+    en_us: "Device registered as model registry"
+    zh_cn: "设备挂载算法模型"
+spec:
+  src:
+    domain: power
+    kind: entity_set
+    name: power.device
+  dest:
+    domain: power
+    kind: entity_set
+    name: power.model_registry
+  entity_link_type: registered_as

@@ -1,0 +1,22 @@
+kind: storage_link
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device.events_to_mysql"
+  domain: power
+  display_name:
+    en_us: "Device events stored in MySQL"
+    zh_cn: "设备事件存储到 MySQL"
+spec:
+  src:
+    domain: power
+    kind: event_set
+    name: power.device.events
+  dest:
+    domain: power
+    kind: mysql
+    name: power.mysql.events
+  fields_mapping:
+    target_id: target_id
+    event_time: event_time

@@ -1,14 +1,9 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+﻿import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import Editor from '@monaco-editor/react'
 import { ArrowRight, BarChart3, CalendarClock, Check, ChevronDown, ChevronLeft, ChevronRight, Database, Eye, Network, Play, Rows3, Search, SearchCode, SlidersHorizontal, Table2, Wand2, X } from 'lucide-react'
 import type { editor as MonacoEditor } from 'monaco-editor'
 import type { QueryExplain, QueryRequest, QueryResult } from '../../api/types'
 import { UModelApi } from '../../api/client'
-<<<<<<< HEAD
-import { Badge, Button, Field, JsonEditor, Panel, TextArea, TextInput } from '../../design/components'
-import { formatError, parseJson, stringify } from '../../lib/json'
-import { useI18n } from '../../i18n'
-=======
 import { Badge, Button, EmptyState, IconButton, SegmentedControl } from '../../design/components'
 import { useI18n, type MessageKey, type TFunction } from '../../i18n'
 import { formatError, stringify } from '../../lib/json'
@@ -68,7 +63,6 @@ const splMinEditorHeight = 41
 const splMaxEditorHeight = 117
 const largeTextCodeblockLength = 1000
 const wrappedTextLineClamp = 4
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 const examples = [
   { labelKey: 'query.examples.umodel', query: ".umodel with(kind='entity_set') | project domain,name,kind | sort domain,name | limit 1000" },
@@ -123,12 +117,8 @@ export function QueryPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
   const [explainOpen, setExplainOpen] = useState(false)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
-<<<<<<< HEAD
-  const { t } = useI18n()
-=======
   const [resultView, setResultView] = useState<ResultView>('table')
   const [splEditorHeight, setSplEditorHeight] = useState(splMinEditorHeight)
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
   const tableResult = useMemo(() => result ? normalizeResultForTable(result) : null, [result])
   const resultColumns = tableResult?.columns.length ? tableResult.columns : tableResult?.rows[0] ? Object.keys(tableResult.rows[0]) : []
@@ -169,56 +159,6 @@ export function QueryPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
   }
 
   return (
-<<<<<<< HEAD
-    <div className="page-grid">
-      <Panel
-        title={<strong>{t('query.title')}</strong>}
-        action={
-          <div className="row">
-            <Button variant="secondary" onClick={() => void run('explain')} disabled={busy}>
-              <SearchCode size={15} />
-              {t('query.explain')}
-            </Button>
-            <Button variant="primary" onClick={() => void run('execute')} disabled={busy}>
-              <Play size={15} />
-              {t('query.execute')}
-            </Button>
-          </div>
-        }
-      >
-        <div className="stack">
-          <Field label={t('query.spl')}>
-            <TextArea value={query} onChange={(event) => setQuery(event.target.value)} style={{ minHeight: 116 }} />
-          </Field>
-          <div className="row" style={{ alignItems: 'end' }}>
-            <div style={{ width: 150 }}>
-              <Field label={t('query.limit')}>
-                <TextInput value={limit} onChange={(event) => setLimit(event.target.value)} />
-              </Field>
-            </div>
-            <div style={{ flex: 1, minWidth: 260 }}>
-              <Field label={t('query.parametersJson')}>
-                <JsonEditor value={parameters} onChange={setParameters} minHeight={76} />
-              </Field>
-            </div>
-          </div>
-          <div className="row">
-            {examples.map((item) => (
-              <Button
-                key={item.label}
-                variant="ghost"
-                onClick={() => {
-                  setQuery(item.query)
-                  setParameters(item.parameters ? stringify(item.parameters) : '{}')
-                }}
-              >
-                <Wand2 size={14} />
-                {item.label}
-              </Button>
-            ))}
-          </div>
-          {error && <Badge tone="danger">{error}</Badge>}
-=======
     <div className="query-workbench">
       <header className="query-head">
         <ExamplePicker value={query} onPick={(item) => {
@@ -235,19 +175,9 @@ export function QueryPage({ api, workspaceId }: { api: UModelApi; workspaceId: s
             <Play size={14} />
             {t('query.action.execute')}
           </Button>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
         </div>
       </header>
 
-<<<<<<< HEAD
-      <div className="two-column">
-        <Panel title={<strong>{t('query.rows')}</strong>} action={result && <Badge>{result.rows.length}</Badge>}>
-          {result ? <ResultTable result={result} /> : <div className="muted">{t('query.noResult')}</div>}
-        </Panel>
-        <Panel title={<strong>{t('query.explainPlan')}</strong>} action={explain?.provider && <Badge tone="indigo">{explain.provider}</Badge>}>
-          <pre className="result-box small">{explain ? stringify(explain) : t('query.noExplainPlan')}</pre>
-        </Panel>
-=======
       {error && <div className="query-error">{error}</div>}
 
       <div className="query-layout">
@@ -374,18 +304,11 @@ function ExamplePicker({
             })}
           </div>
         )}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
       </div>
     </div>
   )
 }
 
-<<<<<<< HEAD
-export function ResultTable({ result }: { result: QueryResult }) {
-  const { t } = useI18n()
-  if (result.rows.length === 0) return <div className="muted">{t('query.noRows')}</div>
-  const columns = result.columns.length > 0 ? result.columns : Object.keys(result.rows[0])
-=======
 function TimeRangeControl({
   value,
   onChange,
@@ -395,7 +318,6 @@ function TimeRangeControl({
 }) {
   const { t } = useI18n()
 
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
   return (
     <div className="query-timebar">
       <CalendarClock size={14} />

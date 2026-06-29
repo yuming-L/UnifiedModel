@@ -1,0 +1,21 @@
+kind: external_storage
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "source.external.fsu"
+  domain: source
+  display_name:
+    en_us: "FSU External Storage"
+    zh_cn: "FSU 外部存储"
+  description:
+    en_us: "External storage reference for FSU and field telemetry delivery."
+    zh_cn: "FSU 与现场遥测交付的外部存储引用。"
+spec:
+  type: "object-store"
+  name: "fsu-archive"
+  properties:
+    endpoint: "oss.power.example"
+    bucket: "power-fsu-archive"
+  tags:
+    sample: power-trusted-workspace

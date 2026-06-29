@@ -1,0 +1,39 @@
+kind: log_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v1.0.0"
+metadata:
+  name: "power.device.logs"
+  domain: power
+  display_name:
+    en_us: "Power Device Logs"
+    zh_cn: "电力设备日志"
+  description:
+    en_us: "Operational logs for alarms, maintenance, and device controller messages."
+    zh_cn: "用于告警、检修和设备控制器消息的运维日志。"
+spec:
+  fields:
+    - name: timestamp
+      type: time
+      display_name: { en_us: "Timestamp", zh_cn: "时间" }
+    - name: target_id
+      type: string
+      display_name: { en_us: "Target ID", zh_cn: "目标ID" }
+    - name: level
+      type: string
+      display_name: { en_us: "Level", zh_cn: "级别" }
+    - name: message
+      type: string
+      display_name: { en_us: "Message", zh_cn: "消息" }
+    - name: device_type
+      type: string
+      display_name: { en_us: "Device Type", zh_cn: "设备类型" }
+  time_field: timestamp
+  name_fields:
+    - message
+  tag_fields:
+    - target_id
+    - level
+    - device_type
+  ordered_fields: ["timestamp", "target_id", "level", "message", "device_type"]
+  default_order: desc

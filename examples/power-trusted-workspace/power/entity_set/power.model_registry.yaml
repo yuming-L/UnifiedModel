@@ -1,0 +1,38 @@
+kind: entity_set
+schema:
+  url: "umodel.aliyun.com"
+  version: "v0.1.0"
+metadata:
+  name: "power.model_registry"
+  domain: power
+  display_name:
+    en_us: "Model Registry"
+    zh_cn: "算法模型注册"
+  description:
+    en_us: "Registry of attached algorithm models and their operational status."
+    zh_cn: "挂载算法模型及其运行状态的注册目录。"
+spec:
+  fields:
+    - name: id
+      type: string
+      display_name: { en_us: "ID", zh_cn: "ID" }
+    - name: display_name
+      type: string
+      display_name: { en_us: "Name", zh_cn: "名称" }
+    - name: status
+      type: string
+      display_name: { en_us: "Status", zh_cn: "状态" }
+    - name: model_type
+      type: string
+      display_name: { en_us: "Model Type", zh_cn: "模型类型" }
+    - name: version
+      type: string
+      display_name: { en_us: "Version", zh_cn: "版本" }
+  primary_key_fields:
+    - id
+  id_generator: "id"
+  name_fields:
+    - display_name
+  ordered_fields: ["id", "display_name", "status", "model_type", "version"]
+  first_observed_time_field: "__first_observed_time__"
+  last_observed_time_field: "__last_observed_time__"

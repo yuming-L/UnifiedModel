@@ -1,13 +1,8 @@
-import { useEffect, useState, type ReactNode } from 'react'
+﻿import { useEffect, useState, type ReactNode } from 'react'
 import Editor from '@monaco-editor/react'
 import { AlertCircle, Save, Trash2 } from 'lucide-react'
 import type { WorkspaceMetadata } from '../../api/types'
 import { UModelApi } from '../../api/client'
-<<<<<<< HEAD
-import { Badge, Button, Field, JsonEditor, Panel, TextInput } from '../../design/components'
-import { formatError, parseJson, stringify } from '../../lib/json'
-import { useI18n } from '../../i18n'
-=======
 import { Badge, Button, Modal, TextInput } from '../../design/components'
 import { LanguageSelect, useI18n } from '../../i18n'
 import { formatError, stringify } from '../../lib/json'
@@ -17,7 +12,6 @@ import './settings.css'
 disableMonacoEditContext()
 
 type SettingsStatus = { type: 'saved' } | { type: 'error'; message: string }
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
 export function SettingsPage({
   api,
@@ -41,11 +35,7 @@ export function SettingsPage({
   const [replaceConfig, setReplaceConfig] = useState(false)
   const [status, setStatus] = useState<SettingsStatus | null>(null)
   const [busy, setBusy] = useState(false)
-<<<<<<< HEAD
-  const { t } = useI18n()
-=======
   const [deleteOpen, setDeleteOpen] = useState(false)
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
 
   useEffect(() => {
     setName(workspace?.name || workspaceId)
@@ -72,11 +62,7 @@ export function SettingsPage({
         replace_config: replaceConfig,
       })
       onWorkspaceChange(next)
-<<<<<<< HEAD
-      setStatus(t('settings.saved'))
-=======
       setStatus({ type: 'saved' })
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
     } catch (error) {
       setStatus({ type: 'error', message: formatError(error) })
     } finally {
@@ -100,43 +86,6 @@ export function SettingsPage({
   }
 
   return (
-<<<<<<< HEAD
-    <div className="two-column">
-      <Panel
-        title={<strong>{t('settings.title')}</strong>}
-        action={workspace && <Badge tone={workspace.status === 'active' ? 'success' : 'warning'}>v{workspace.resource_version}</Badge>}
-      >
-        <div className="stack">
-          <Field label={t('settings.name')}>
-            <TextInput value={name} onChange={(event) => setName(event.target.value)} />
-          </Field>
-          <Field label={t('settings.description')}>
-            <TextInput value={description} onChange={(event) => setDescription(event.target.value)} />
-          </Field>
-          <Field label={t('settings.labelsJson')}>
-            <JsonEditor value={labels} onChange={setLabels} minHeight={150} />
-          </Field>
-          <label className="row small muted">
-            <input type="checkbox" checked={replaceLabels} onChange={(event) => setReplaceLabels(event.target.checked)} />
-            {t('settings.replaceLabels')}
-          </label>
-          <Field label={t('settings.configJson')}>
-            <JsonEditor value={config} onChange={setConfig} minHeight={190} />
-          </Field>
-          <label className="row small muted">
-            <input type="checkbox" checked={replaceConfig} onChange={(event) => setReplaceConfig(event.target.checked)} />
-            {t('settings.replaceConfig')}
-          </label>
-          {status && <Badge tone={status === t('settings.saved') ? 'success' : 'danger'}>{status}</Badge>}
-          <div className="toolbar">
-            <Button variant="danger" onClick={() => void remove()} disabled={busy}>
-              <Trash2 size={15} />
-              {t('settings.deleteWorkspace')}
-            </Button>
-            <Button variant="primary" onClick={() => void save()} disabled={busy}>
-              <Save size={15} />
-              {t('settings.save')}
-=======
     <div className="settings-workbench">
       <header className="settings-head">
         <div className="settings-title">
@@ -203,16 +152,10 @@ export function SettingsPage({
             <Button variant="danger" onClick={() => setDeleteOpen(true)} disabled={busy}>
               <Trash2 size={15} />
               {t('settings.deleteWorkspace')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
             </Button>
           </div>
         </section>
 
-<<<<<<< HEAD
-      <Panel title={<strong>{t('settings.metadata')}</strong>}>
-        <pre className="result-box small">{workspace ? stringify(workspace) : t('settings.noMetadata')}</pre>
-      </Panel>
-=======
         <aside className="settings-side">
           <section className="settings-side-panel settings-preferences-panel">
             <div className="settings-panel-header">
@@ -401,7 +344,6 @@ function MonacoBlock({
           wordWrap: 'on',
         }}
       />
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06
     </div>
   )
 }
