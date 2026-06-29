@@ -59,6 +59,32 @@ func (s *MemoryStore) PutUModelElements(ctx context.Context, batch model.UModelE
 	return model.WriteResult{Accepted: len(batch.Elements), Items: items}, nil
 }
 
+func (s *MemoryStore) DeleteUModelElements(ctx context.Context, workspace string, ids []string) (model.WriteResult, error) {
+	if workspace == "" {
+		return model.WriteResult{}, fmt.Errorf("workspace is required")
+	}
+
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	s.ensureWorkspaceLocked(workspace)
+
+	items := make([]model.BatchItemResult, 0, len(ids))
+	for _, rawID := range ids {
+		id := strings.TrimSpace(rawID)
+		if id == "" {
+			items = append(items, writeFailure(id, apperrors.CodeValidationFailed, "umodel element id is required"))
+			continue
+		}
+		if _, exists := s.umodels[workspace][id]; !exists {
+			items = append(items, writeFailure(id, apperrors.CodeNotFound, "umodel element not found"))
+			continue
+		}
+		delete(s.umodels[workspace], id)
+		items = append(items, model.BatchItemResult{ID: id, OK: true})
+	}
+	return summarizeItems(items), nil
+}
+
 func (s *MemoryStore) GetUModelSnapshot(ctx context.Context, req model.UModelSnapshotRequest) (model.UModelSnapshot, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
@@ -182,6 +208,9 @@ func (s *MemoryStore) WriteRelations(ctx context.Context, batch model.RelationWr
 }
 
 func (s *MemoryStore) QueryEntities(ctx context.Context, plan model.EntityQueryPlan) (model.QueryResult, error) {
+	if err := ctx.Err(); err != nil {
+		return model.QueryResult{}, err
+	}
 	limit := normalizeLimit(plan.Limit, 100)
 
 	s.mu.RLock()
@@ -195,6 +224,9 @@ func (s *MemoryStore) QueryEntities(ctx context.Context, plan model.EntityQueryP
 	sort.Strings(keys)
 
 	for _, key := range keys {
+		if err := ctx.Err(); err != nil {
+			return model.QueryResult{}, err
+		}
 		payload := s.entities[plan.Workspace][key]
 		if !entityMatches(payload, plan) {
 			continue
@@ -213,6 +245,9 @@ func (s *MemoryStore) QueryEntities(ctx context.Context, plan model.EntityQueryP
 }
 
 func (s *MemoryStore) QueryTopo(ctx context.Context, plan model.TopoQueryPlan) (model.QueryResult, error) {
+	if err := ctx.Err(); err != nil {
+		return model.QueryResult{}, err
+	}
 	limit := normalizeLimit(plan.Limit, 100)
 
 	s.mu.RLock()
@@ -230,6 +265,9 @@ func (s *MemoryStore) QueryTopo(ctx context.Context, plan model.TopoQueryPlan) (
 	sort.Strings(keys)
 
 	for _, key := range keys {
+		if err := ctx.Err(); err != nil {
+			return model.QueryResult{}, err
+		}
 		payload := s.relations[plan.Workspace][key]
 		if !relationMatches(payload, plan) {
 			continue
@@ -256,8 +294,11 @@ func (s *MemoryStore) Capabilities(ctx context.Context) (model.GraphStoreCapabil
 		TimeVisibility:     true,
 		ServerSideFilter:   false,
 		MaxDepth:           2,
-		MaxLimit:           100,
-		Timeout:            "10s",
+		// Memory backs --quickstart / MCP / demos and has no storage backend, so
+		// it serves a generous row ceiling. Kept >= the default local.ladybug
+		// provider's 1000 so any production-valid `limit` is also valid here.
+		MaxLimit: 10000,
+		Timeout:  "10s",
 	}, nil
 }
 
@@ -506,7 +547,10 @@ func methodOf(payload map[string]any) string {
 }
 
 func normalizeLimit(limit, fallback int) int {
-	if limit <= 0 {
+	if limit < 0 {
+		return 1<<31 - 1
+	}
+	if limit == 0 {
 		return fallback
 	}
 	return limit

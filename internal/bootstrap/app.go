@@ -290,7 +290,7 @@ var serviceVersion = "dev"
 
 // handleCapabilities reports what query modes this server supports.
 // unified-model is plan-only by design; umodel-assistant supports plan and data.
-// See docs/en/spec/plan-schema-v1.md for the shared mode protocol.
+// See docs/en/guides/agent-integration.md for the shared mode protocol.
 func (a *App) handleCapabilities(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodGet {
 		writeError(w, apperrors.New(apperrors.CodeInvalidArgument, "method not allowed"))
@@ -628,8 +628,13 @@ func workspaceAction(path, prefix string) (string, string, bool) {
 	return parts[0], parts[1], true
 }
 
+// maxRequestBodyBytes caps a decoded JSON request body so a single request
+// cannot exhaust server memory.
+const maxRequestBodyBytes = 32 << 20 // 32 MiB
+
 func decodeJSON(w http.ResponseWriter, r *http.Request, target any) bool {
 	defer r.Body.Close()
+	r.Body = http.MaxBytesReader(w, r.Body, maxRequestBodyBytes)
 	decoder := json.NewDecoder(r.Body)
 	decoder.DisallowUnknownFields()
 	if err := decoder.Decode(target); err != nil {

@@ -12,11 +12,16 @@ UModel（Unified Model）是面向企业 AI、数据治理和智能运维的厂�
 UModel 支持：
 
 - 编写和导入模型包，定义企业对象、运维对象、数据集、链接、存储和拓扑语义。
-- 写入 CMS 2.0 兼容的运行时实体与关系。
 - 通过 `.umodel`、`.entity`、`.topo` 这一组 SPL 入口统一查询模型、实体和拓扑。
 - 通过本地 Web UI 探索 workspace。
 - 通过 AgentGateway 和 MCP 连接 Agent client。
 - 使用公开 REST、CLI 和 SDK 契约，不依赖服务端内部实现。
+
+## 演示
+
+<video src="https://github.com/user-attachments/assets/3cdc72de-2f78-495c-baf9-7066c1d9792f" controls></video>
+
+AI Agent 在 `quickstart-multidomain` workspace 上读取对象图（90 秒）：发现服务、沿跨域拓扑遍历、并通过模型自动生成的查询计划拉取指标和日志，全程不手写一条查询。
 
 ## 为什么需要 UModel
 
@@ -82,7 +87,7 @@ make stop-all
 /plugin install umodel@unifiedmodel
 ```
 
-Cursor、Qoder、Codex 等 Agent 可直接加载同样的 `SKILL.md` 文件。技能目录见 [UModel Agent 技能](skills/README.zh-CN.md)，端到端走查见 [技能快速上手](skills/QUICKSTART.zh-CN.md)。
+Qoder、Codex、Cursor 等 Agent 加载同样的两个 `SKILL.md` 文件——把它们拷进对应 Agent 的技能目录（Qoder 用 `.qoder/skills/`，Codex 用 `.agents/skills/`，Claude Code 用 `.claude/skills/`）。技能目录见 [UModel Agent 技能](skills/README.zh-CN.md)，分平台安装见 [技能快速上手](skills/QUICKSTART.zh-CN.md)。
 
 ## 架构
 

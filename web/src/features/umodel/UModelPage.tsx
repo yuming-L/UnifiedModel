@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import ReactDOM from 'react-dom'
-import Editor, { DiffEditor } from '@monaco-editor/react'
+import Editor, { DiffEditor, useMonaco } from '@monaco-editor/react'
 import * as YAML from 'js-yaml'
 import {
   Box,
@@ -28,23 +28,15 @@ import {
   type NodeChange,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import type { QueryResult, UModelElement } from '../../api/types'
+import type { BatchItemResult, QueryResult, UModelElement, WriteResult } from '../../api/types'
 import { UModelApi } from '../../api/client'
 import { Button, EmptyState, IconButton, SegmentedControl } from '../../design/components'
 import { useI18n, type TFunction } from '../../i18n'
 import { asArray, formatError, parseJson, stringify } from '../../lib/json'
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-import { useI18n } from '../../i18n'
-import { buildGraph, layoutGraphWithGraphviz, type ExplorerEdgeData, type ExplorerNodeData, type GraphModel } from './graphModel'
-import { SearchPanel } from './ExplorerSearchPanel'
-import { FilterBar, SettingsSidebar, SummarySidebar } from './ExplorerSidebar'
-import { GraphView } from './ExplorerGraphView'
-=======
 import { buildGraph, layoutGraphWithGraphviz, type UModelNodeData, type GraphModel } from './graphModel'
 import { SearchPanel } from './UModelSearchPanel'
 import { FilterBar, SettingsSidebar, SummarySidebar } from './UModelSidebar'
 import { GraphView } from './UModelGraphView'
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
 import {
   aliasForElements,
   asUnknownArray,
@@ -88,6 +80,11 @@ import './umodel.css'
 
 type SidebarTab = 'summary' | 'settings'
 
+interface SubmitFailure {
+  summary: string
+  details: string[]
+}
+
 export function UModelPage({
   api,
   workspaceId,
@@ -105,6 +102,7 @@ export function UModelPage({
   const [layouting, setLayouting] = useState(false)
   const [error, setError] = useState('')
   const [, setMessage] = useState('')
+  const [submitFailure, setSubmitFailure] = useState<SubmitFailure | null>(null)
   const [queryResult, setQueryResult] = useState<QueryResult | null>(null)
   const [mode, setMode] = useState<ViewMode>('graph')
   const [sidebarTab, setSidebarTab] = useState<SidebarTab>('summary')
@@ -133,7 +131,6 @@ export function UModelPage({
   const searchBlurRef = useRef<number | null>(null)
   const searchWrapRef = useRef<HTMLDivElement | null>(null)
   const [searchPanelStyle, setSearchPanelStyle] = useState<CSSProperties>()
-  const { t } = useI18n()
 
   const updateSearchPanelGeometry = useCallback(() => {
     const wrap = searchWrapRef.current
@@ -434,6 +431,7 @@ export function UModelPage({
   async function commitDraft() {
     if (!hasChanges) return
     setCommitting(true)
+    setSubmitFailure(null)
     setError('')
     setMessage('')
     try {
@@ -441,27 +439,39 @@ export function UModelPage({
       if (upserts.length > 0) {
         const validation = await api.validateUModel(workspaceId, upserts)
         if (!validation.valid) {
-          setError(formatValidationErrors(validation.errors, t))
+          const failure = buildSubmitFailure(
+            t('umodelExplorer.submitFailure.validation'),
+            formatValidationErrorLines(validation.errors, t),
+          )
+          setSubmitFailure(failure)
+          setError(failure.summary)
           return
         }
         const result = await api.putUModel(workspaceId, upserts)
-        if (result.failed > 0) {
-          setError(stringify(result))
+        const failure = formatWriteFailure(result, t('umodelExplorer.submitFailure.operation.upsert'), t)
+        if (failure) {
+          setSubmitFailure(failure)
+          setError(failure.summary)
           return
         }
       }
       if (diff.deleted.length > 0) {
         const result = await api.deleteUModel(workspaceId, diff.deleted.map(elementKey))
-        if (result.failed > 0) {
-          setError(stringify(result))
+        const failure = formatWriteFailure(result, t('umodelExplorer.submitFailure.operation.delete'), t)
+        if (failure) {
+          setSubmitFailure(failure)
+          setError(failure.summary)
           return
         }
       }
       setDiffOpen(false)
+      setSubmitFailure(null)
       await load()
       setMessage(t('umodelExplorer.message.submitted', { upserts: upserts.length, deletes: diff.deleted.length }))
     } catch (nextError) {
-      setError(formatError(nextError))
+      const failure = buildSubmitFailure(t('umodelExplorer.submitFailure.unexpected'), [formatError(nextError)])
+      setSubmitFailure(failure)
+      setError(failure.summary)
     } finally {
       setCommitting(false)
     }
@@ -512,17 +522,10 @@ export function UModelPage({
     <div className="ume-v2 umodel-page">
       <aside className="ume-sidebar">
         <div className="ume-sidebar-tabs">
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-          <button className={sidebarTab === 'summary' ? 'active' : ''} onClick={() => setSidebarTab('summary')} type="button" title={t('explorer.summary')}>
-            <Layers size={15} />
-          </button>
-          <button className={sidebarTab === 'settings' ? 'active' : ''} onClick={() => setSidebarTab('settings')} type="button" title={t('explorer.settings')}>
-=======
           <button className={sidebarTab === 'summary' ? 'active' : ''} onClick={() => setSidebarTab('summary')} type="button" title={t('umodelExplorer.tabs.summary')}>
             <Layers size={15} />
           </button>
           <button className={sidebarTab === 'settings' ? 'active' : ''} onClick={() => setSidebarTab('settings')} type="button" title={t('umodelExplorer.tabs.settings')}>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
             <Settings2 size={15} />
           </button>
         </div>
@@ -559,13 +562,8 @@ export function UModelPage({
               value={mode}
               onChange={setMode}
               items={[
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-                { value: 'graph', label: t('explorer.graph'), icon: <GitBranch size={14} /> },
-                { value: 'table', label: t('explorer.table'), icon: <Table2 size={14} /> },
-=======
                 { value: 'graph', label: t('umodelExplorer.view.graph'), icon: <GitBranch size={14} /> },
                 { value: 'table', label: t('umodelExplorer.view.table'), icon: <Table2 size={14} /> },
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
               ]}
             />
           </div>
@@ -620,11 +618,7 @@ export function UModelPage({
             {error && <span className="ume-toast danger">{error}</span>}
             <span className="ume-action-divider" />
             <div className="ume-add-menu-wrap">
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-              <IconButton className="ume-icon-button" label={t('explorer.addElement')} onClick={() => setAddMenuOpen((value) => !value)} type="button">
-=======
               <IconButton className="ume-icon-button" label={t('umodelExplorer.action.add')} onClick={() => setAddMenuOpen((value) => !value)} type="button">
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
                 <Plus size={15} />
               </IconButton>
               {addMenuOpen && (
@@ -644,15 +638,6 @@ export function UModelPage({
                 </div>
               )}
             </div>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            <IconButton className="ume-icon-button" label={t('app.refresh')} onClick={() => void load()} type="button">
-              <RefreshCcw size={15} />
-            </IconButton>
-            <IconButton className="ume-icon-button" disabled={undoStack.length === 0} label={t('explorer.undo')} onClick={undoDraft} type="button">
-              <Undo2 size={15} />
-            </IconButton>
-            <IconButton className="ume-icon-button" disabled={redoStack.length === 0} label={t('explorer.redo')} onClick={redoDraft} type="button">
-=======
             <IconButton className="ume-icon-button" label={t('umodelExplorer.action.refreshResetDraft')} onClick={() => void load()} type="button">
               <RefreshCcw size={15} />
             </IconButton>
@@ -660,19 +645,17 @@ export function UModelPage({
               <Undo2 size={15} />
             </IconButton>
             <IconButton className="ume-icon-button" disabled={redoStack.length === 0} label={t('umodelExplorer.action.redo')} onClick={redoDraft} type="button">
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
               <Redo2 size={15} />
             </IconButton>
             <button
               className="ume-submit-button"
               disabled={!hasChanges}
-              onClick={() => setDiffOpen(true)}
+              onClick={() => {
+                setSubmitFailure(null)
+                setDiffOpen(true)
+              }}
               type="button"
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-              title={t('explorer.commitChanges')}
-=======
               title={t('umodelExplorer.action.reviewDiffSubmit')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
             >
               <Save size={14} />
               {t('umodelExplorer.action.submit')}
@@ -703,15 +686,6 @@ export function UModelPage({
 
         <div className="ume-content-area">
           <main className="ume-content-main">
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            {loading && draftElements.length === 0 && <div className="ume-loading">{t('explorer.loadingGraph')}</div>}
-            {loading && draftElements.length > 0 && <div className="ume-layout-badge">{t('explorer.refreshingApi')}</div>}
-            {!loading && draftElements.length === 0 && (
-              <div className="ume-empty-wrap">
-                <EmptyState
-                  title={t('explorer.noElements')}
-                  detail={t('explorer.noElementsDetail')}
-=======
             {loading && draftElements.length === 0 && <div className="ume-loading">{t('umodelExplorer.loading.graph')}</div>}
             {loading && draftElements.length > 0 && <div className="ume-layout-badge">{t('umodelExplorer.loading.refreshingApi')}</div>}
             {!loading && draftElements.length === 0 && (
@@ -719,7 +693,6 @@ export function UModelPage({
                 <EmptyState
                   title={t('umodelExplorer.empty.elements.title')}
                   detail={t('umodelExplorer.empty.elements.detail')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
                   action={
                     <Button variant="primary" onClick={() => void importSample()}>
                       <Database size={16} />
@@ -762,15 +735,9 @@ export function UModelPage({
         </div>
 
         <footer className="ume-statusbar">
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-          <span><strong>{filteredStats.nodes}</strong> {t('explorer.nodes')}</span>
-          <span className="ume-status-sep" />
-          <span><strong>{filteredStats.links}</strong> {t('explorer.links')}</span>
-=======
           <span><strong>{filteredStats.nodes}</strong> {t('umodelExplorer.status.nodes')}</span>
           <span className="ume-status-sep" />
           <span><strong>{filteredStats.links}</strong> {t('umodelExplorer.status.links')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           {resultLimitReached && resultLimit && (
             <>
               <span className="ume-status-sep" />
@@ -814,7 +781,11 @@ export function UModelPage({
           diff={diff}
           serverElements={serverElements}
           committing={committing}
-          onClose={() => setDiffOpen(false)}
+          submitFailure={submitFailure}
+          onClose={() => {
+            setDiffOpen(false)
+            setSubmitFailure(null)
+          }}
           onFocusElement={focusSingleElement}
           onSubmit={() => void commitDraft()}
         />
@@ -920,11 +891,7 @@ function TableView({
             })}
             {pagedRows.length === 0 && (
               <tr>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-                <td colSpan={7} className="ume-empty-cell">{t('explorer.noMatchingModels')}</td>
-=======
                 <td colSpan={7} className="ume-empty-cell">{t('umodelExplorer.empty.matchingModels')}</td>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
               </tr>
             )
             }
@@ -946,13 +913,9 @@ function TableView({
         <select value={pageSize} onChange={(event) => setPageSize(Number(event.target.value))}>
           {[20, 50, 100].map((size) => <option key={size} value={size}>{t('umodelExplorer.table.pageSize', { size })}</option>)}
         </select>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-        <span>{t('explorer.total')} <strong>{rows.length}</strong> {t('explorer.items')}</span>
-=======
         <span>{t.rich('umodelExplorer.status.totalItemsRich', {
           strong: (chunks) => <strong>{chunks}</strong>,
         }, { count: rows.length })}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
       </div>
     </div>
   )
@@ -999,11 +962,7 @@ function TableDeleteButton({
 
   return (
     <>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-      <button ref={buttonRef} className="ume-table-delete-button" onClick={handleClick} type="button" title={isLink ? t('explorer.deleteLink') : t('explorer.delete')}>
-=======
       <button ref={buttonRef} className="ume-table-delete-button" onClick={handleClick} type="button" title={isLink ? t('umodelExplorer.action.deleteLink') : t('umodelExplorer.action.delete')}>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
         <Trash2 size={13} />
       </button>
       {open && rect && ReactDOM.createPortal(
@@ -1118,11 +1077,7 @@ function DetailPanel({
           <code>{element.domain || t('umodelExplorer.misc.unknown')}@{element.name || elementKey(element)}</code>
         </div>
         <span className="ume-kind-badge" style={{ background: color.bg, color: color.text }}>{color.label}</span>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-        <button className="ume-icon-button subtle" onClick={onClose} type="button" title={t('explorer.close')}>
-=======
         <button className="ume-icon-button subtle" onClick={onClose} type="button" title={t('umodelExplorer.action.close')}>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           <X size={15} />
         </button>
       </header>
@@ -1215,13 +1170,8 @@ function CreateNodeDialog({
       <section className="ume-dialog ume-dialog-wide ume-create-node-dialog">
         <header>
           <div>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            <strong>{t('explorer.newNode')}</strong>
-          <span>{t('explorer.newNodeDetail')}</span>
-=======
             <strong>{t('umodelExplorer.dialog.create.title')}</strong>
             <span>{t('umodelExplorer.dialog.create.description')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           </div>
           <button className="ume-icon-button subtle" onClick={onClose} type="button">
             <X size={15} />
@@ -1257,17 +1207,10 @@ function CreateNodeDialog({
           </section>
         </div>
         <footer>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-          <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
-          <button className="ume-primary-button" disabled={busy} onClick={() => void create()} type="button">
-            <Plus size={14} />
-            {t('explorer.create')}
-=======
           <button className="ume-secondary-inline" onClick={onClose} type="button">{t('common.cancel')}</button>
           <button className="ume-primary-button" disabled={busy} onClick={() => void create()} type="button">
             <Plus size={14} />
             {t('common.create')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           </button>
         </footer>
       </section>
@@ -1329,13 +1272,8 @@ function UploadDialog({
       <section className="ume-dialog ume-dialog-wide">
         <header>
           <div>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            <strong>{t('explorer.uploadYamlJson')}</strong>
-            <span>{t('explorer.uploadYamlJsonDetail')}</span>
-=======
             <strong>{t('umodelExplorer.dialog.upload.title')}</strong>
             <span>{t('umodelExplorer.dialog.upload.description')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           </div>
           <button className="ume-icon-button subtle" onClick={onClose} type="button">
             <X size={15} />
@@ -1383,17 +1321,10 @@ function UploadDialog({
           {status && <pre className="ume-result-box">{status}</pre>}
         </div>
         <footer>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-          <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
-          <button className="ume-primary-button" disabled={busy} onClick={() => void upload()} type="button">
-            <FileUp size={14} />
-            {t('explorer.addToDraft')}
-=======
           <button className="ume-secondary-inline" onClick={onClose} type="button">{t('common.cancel')}</button>
           <button className="ume-primary-button" disabled={busy} onClick={() => void upload()} type="button">
             <FileUp size={14} />
             {t('umodelExplorer.action.addToDraft')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           </button>
         </footer>
       </section>
@@ -1516,11 +1447,7 @@ function NodePickerTable({
             })}
             {pagedRows.length === 0 && (
               <tr>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-                <td colSpan={4} className="ume-empty-cell">{t('explorer.noMatchingNodes')}</td>
-=======
                 <td colSpan={4} className="ume-empty-cell">{t('umodelExplorer.empty.matchingNodes')}</td>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
               </tr>
             )}
           </tbody>
@@ -1584,17 +1511,12 @@ function ConnectDialog({
       <section className="ume-dialog ume-dialog-wide ume-connect-dialog">
         <header>
           <div>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            <strong>{source ? t('explorer.connectTo') : t('explorer.newLink')}</strong>
-            <span>{source ? `${t('explorer.createLinksFrom')} ${titleForElement(source)}` : t('explorer.selectSourceTarget')}</span>
-=======
             <strong>{source ? t('umodelExplorer.action.connectTo') : t('umodelExplorer.dialog.connect.newLink')}</strong>
             <span>
               {source
                 ? t('umodelExplorer.dialog.connect.fromSource', { name: titleForElement(source) })
                 : t('umodelExplorer.dialog.connect.description')}
             </span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           </div>
           <button className="ume-icon-button subtle" onClick={onClose} type="button">
             <X size={15} />
@@ -1624,15 +1546,6 @@ function ConnectDialog({
         </div>
         <footer>
           <span className="ume-connect-footer-note">
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            {selectedSource ? `${t('explorer.source')}: ${titleForElement(selectedSource)}` : t('explorer.selectSourceNode')}
-            {targetCount > 0 ? ` · ${targetCount} ${t('explorer.targetsSelected')}` : ''}
-          </span>
-          <div>
-            <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
-            <button className="ume-primary-button" disabled={!selectedSource || targetCount === 0} onClick={confirm} type="button">
-              {t('explorer.create')}{targetCount > 0 ? ` (${targetCount})` : ''}
-=======
             {selectedSource
               ? t('umodelExplorer.dialog.connect.sourceWithName', { name: titleForElement(selectedSource) })
               : t('umodelExplorer.dialog.connect.selectSource')}
@@ -1644,7 +1557,6 @@ function ConnectDialog({
             <button className="ume-secondary-inline" onClick={onClose} type="button">{t('common.cancel')}</button>
             <button className="ume-primary-button" disabled={!selectedSource || targetCount === 0} onClick={confirm} type="button">
               {targetCount > 0 ? t('umodelExplorer.action.createCount', { count: targetCount }) : t('common.create')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
             </button>
           </div>
         </footer>
@@ -1657,6 +1569,7 @@ function DiffDialog({
   diff,
   serverElements,
   committing,
+  submitFailure,
   onClose,
   onFocusElement,
   onSubmit,
@@ -1664,6 +1577,7 @@ function DiffDialog({
   diff: DraftDiff
   serverElements: UModelElement[]
   committing: boolean
+  submitFailure: SubmitFailure | null
   onClose: () => void
   onFocusElement: (element: UModelElement) => void
   onSubmit: () => void
@@ -1679,6 +1593,7 @@ function DiffDialog({
   const selected = changes[selectedIndex] || changes[0]
   const originalJson = selected?.type === 'added' ? '' : stringify(selected?.original || {})
   const modifiedJson = selected?.type === 'deleted' ? '' : stringify(selected?.element || {})
+  const selectedModelKey = selected ? `${selected.type}:${elementKey(selected.element)}` : 'empty'
 
   useEffect(() => {
     if (selectedIndex >= changes.length) setSelectedIndex(0)
@@ -1689,28 +1604,31 @@ function DiffDialog({
       <section className="ume-diff-drawer">
         <header>
           <div>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            <strong>{t('explorer.submitPreview')}</strong>
-            <span>{t('explorer.reviewDraftDiff')}</span>
-=======
             <strong>{t('umodelExplorer.dialog.diff.title')}</strong>
             <span>{t('umodelExplorer.dialog.diff.description')}</span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           </div>
-          <button className="ume-icon-button subtle" onClick={onClose} type="button">
+          <button className="ume-icon-button subtle" disabled={committing} onClick={onClose} type="button">
             <X size={15} />
           </button>
         </header>
         <div className="ume-diff-summary">
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-          <span>{t('explorer.added')} <strong>{diff.added.length}</strong></span>
-          <span>{t('explorer.modified')} <strong>{diff.modified.length}</strong></span>
-          <span>{t('explorer.deleted')} <strong>{diff.deleted.length}</strong></span>
-=======
           <span>{t('umodelExplorer.dialog.diff.added')} <strong>{diff.added.length}</strong></span>
           <span>{t('umodelExplorer.dialog.diff.modified')} <strong>{diff.modified.length}</strong></span>
           <span>{t('umodelExplorer.dialog.diff.deleted')} <strong>{diff.deleted.length}</strong></span>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
+        </div>
+        <div className={`ume-submit-failure-slot ${submitFailure ? 'visible' : ''}`}>
+          {submitFailure && (
+            <div className="ume-submit-failure" role="alert">
+              <strong>{submitFailure.summary}</strong>
+              {submitFailure.details.length > 0 && (
+                <ul>
+                  {submitFailure.details.map((detail, index) => (
+                    <li key={`${index}-${detail}`}>{detail}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
         </div>
         <div className="ume-dialog-body">
           <div className="ume-diff-list">
@@ -1747,11 +1665,7 @@ function DiffDialog({
                 ) : <em />}
               </div>
             ))}
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-            {changes.length === 0 && <div className="ume-empty-search">{t('explorer.noDraftChanges')}</div>}
-=======
             {changes.length === 0 && <div className="ume-empty-search">{t('umodelExplorer.empty.draftChanges')}</div>}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
           </div>
           <div className="ume-diff-viewer">
             {selected ? (
@@ -1761,50 +1675,90 @@ function DiffDialog({
                   <strong>{titleForElement(selected.element)}</strong>
                   <code>{elementKey(selected.element)}</code>
                 </div>
-                <DiffEditor
+                <SafeDiffEditor
+                  modelKey={selectedModelKey}
                   original={originalJson}
                   modified={modifiedJson}
-                  language="json"
-                  theme="vs"
-                  options={{
-                    automaticLayout: true,
-                    fontFamily: 'SF Mono, Fira Code, Consolas, monospace',
-                    fontSize: 12,
-                    minimap: { enabled: false },
-                    originalEditable: false,
-                    readOnly: true,
-                    renderMarginRevertIcon: false,
-                    renderSideBySide: true,
-                    scrollBeyondLastLine: false,
-                    wordWrap: 'on',
-                  }}
                 />
               </>
             ) : (
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-              <div className="ume-empty-search">{t('explorer.noDiffSelected')}</div>
-=======
               <div className="ume-empty-search">{t('umodelExplorer.empty.diffSelected')}</div>
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
             )}
           </div>
         </div>
         <footer>
-<<<<<<< HEAD:web/src/features/explorer/ExplorerPage.tsx
-          <button className="ume-secondary-inline" onClick={onClose} type="button">{t('explorer.cancel')}</button>
+          <button className="ume-secondary-inline" disabled={committing} onClick={onClose} type="button">{t('common.cancel')}</button>
           <button className="ume-primary-button" disabled={committing || changes.length === 0} onClick={onSubmit} type="button">
             <Save size={14} />
-            {t('explorer.confirmSubmit')}
-=======
-          <button className="ume-secondary-inline" onClick={onClose} type="button">{t('common.cancel')}</button>
-          <button className="ume-primary-button" disabled={committing || changes.length === 0} onClick={onSubmit} type="button">
-            <Save size={14} />
-            {t('umodelExplorer.action.confirmSubmit')}
->>>>>>> 53f07dd41ab361d024d98d03098adaf86c2b4f06:web/src/features/umodel/UModelPage.tsx
+            {committing ? t('umodelExplorer.action.submitting') : t('umodelExplorer.action.confirmSubmit')}
           </button>
         </footer>
       </section>
     </div>
+  )
+}
+
+function SafeDiffEditor({
+  modelKey,
+  original,
+  modified,
+}: {
+  modelKey: string
+  original: string
+  modified: string
+}) {
+  const monaco = useMonaco()
+  const monacoRef = useRef(monaco)
+  const modelPathsRef = useRef<Set<string>>(new Set())
+  const safeModelKey = encodeURIComponent(modelKey)
+  const originalModelPath = `inmemory://umodel-diff/${safeModelKey}.original.json`
+  const modifiedModelPath = `inmemory://umodel-diff/${safeModelKey}.modified.json`
+
+  useEffect(() => {
+    monacoRef.current = monaco
+  }, [monaco])
+
+  useEffect(() => {
+    modelPathsRef.current.add(originalModelPath)
+    modelPathsRef.current.add(modifiedModelPath)
+  }, [modifiedModelPath, originalModelPath])
+
+  useEffect(() => {
+    return () => {
+      const monacoInstance = monacoRef.current
+      const modelPaths = Array.from(modelPathsRef.current)
+      window.setTimeout(() => {
+        for (const path of modelPaths) {
+          const model = monacoInstance?.editor.getModel(monacoInstance.Uri.parse(path))
+          model?.dispose()
+        }
+      }, 0)
+    }
+  }, [])
+
+  return (
+    <DiffEditor
+      original={original}
+      modified={modified}
+      language="json"
+      originalModelPath={originalModelPath}
+      modifiedModelPath={modifiedModelPath}
+      keepCurrentOriginalModel
+      keepCurrentModifiedModel
+      theme="vs"
+      options={{
+        automaticLayout: true,
+        fontFamily: 'SF Mono, Fira Code, Consolas, monospace',
+        fontSize: 12,
+        minimap: { enabled: false },
+        originalEditable: false,
+        readOnly: true,
+        renderMarginRevertIcon: false,
+        renderSideBySide: true,
+        scrollBeyondLastLine: false,
+        wordWrap: 'on',
+      }}
+    />
   )
 }
 
@@ -1863,10 +1817,46 @@ function normalizeUModelElement(value: unknown, t?: TFunction): UModelElement {
   return element
 }
 
-function formatValidationErrors(errors: Array<{ field?: string; reason?: string }> | undefined, t: TFunction) {
+function formatValidationErrorLines(errors: Array<{ field?: string; reason?: string }> | undefined, t: TFunction) {
   return (errors || [])
     .map((item) => `${item.field || t('umodelExplorer.validation.elementLabel')}: ${item.reason || t('umodelExplorer.validation.failed')}`)
-    .join('\n') || t('umodelExplorer.validation.failed')
+}
+
+function formatValidationErrors(errors: Array<{ field?: string; reason?: string }> | undefined, t: TFunction) {
+  return formatValidationErrorLines(errors, t).join('\n') || t('umodelExplorer.validation.failed')
+}
+
+function buildSubmitFailure(summary: string, details: string[]): SubmitFailure {
+  return { summary, details: details.filter(Boolean) }
+}
+
+function formatWriteFailure(result: WriteResult, operation: string, t: TFunction): SubmitFailure | null {
+  if (result.failed <= 0) return null
+  const failedItems = (result.items || []).filter((item) => !item.ok)
+  const visibleItems = failedItems.slice(0, 8)
+  const details = visibleItems.map((item) => formatBatchFailure(item, t))
+  const hiddenCount = failedItems.length - visibleItems.length
+  if (hiddenCount > 0) {
+    details.push(t('umodelExplorer.submitFailure.moreItems', { count: hiddenCount }))
+  }
+  if (details.length === 0) {
+    details.push(t('umodelExplorer.submitFailure.noItemDetails'))
+  }
+  return {
+    summary: t('umodelExplorer.submitFailure.writeResult', {
+      operation,
+      accepted: result.accepted,
+      failed: result.failed,
+    }),
+    details,
+  }
+}
+
+function formatBatchFailure(item: BatchItemResult, t: TFunction) {
+  const id = item.id || t('umodelExplorer.submitFailure.unknownItem')
+  const code = item.code ? ` [${item.code}]` : ''
+  const message = item.message || t('umodelExplorer.submitFailure.noMessage')
+  return `${id}${code}: ${message}`
 }
 
 type DraftChangeType = 'added' | 'modified' | 'deleted'

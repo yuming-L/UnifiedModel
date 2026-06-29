@@ -12,11 +12,16 @@ UModel (Unified Model) is a vendor-neutral semantic runtime for enterprise AI, d
 With UModel, you can:
 
 - Author and import model packs that define enterprise objects, operational objects, datasets, links, storage, and topology semantics.
-- Write CMS 2.0 compatible runtime entities and relations.
 - Query models, entities, and topology through one SPL surface: `.umodel`, `.entity`, and `.topo`.
 - Explore the workspace through a local Web UI.
 - Connect agent clients through AgentGateway and MCP.
 - Use public REST, CLI, and SDK contracts without depending on server internals.
+
+## Demo
+
+<video src="https://github.com/user-attachments/assets/3cdc72de-2f78-495c-baf9-7066c1d9792f" controls></video>
+
+An AI agent reads across the object graph in the `quickstart-multidomain` workspace (90 seconds): it discovers services, walks cross-domain topology, and pulls metrics and logs through model-scoped query plans, without hand-writing a single query.
 
 ## Why UModel
 
@@ -82,7 +87,7 @@ Loadable skills let a skill-aware agent drive UModel directly — read entities,
 /plugin install umodel@unifiedmodel
 ```
 
-Cursor, Qoder, Codex, and other agents load the same `SKILL.md` files directly. See [Agent Skills](skills/README.md) for the catalog and [the skills quickstart](skills/QUICKSTART.md) for an end-to-end walkthrough.
+Qoder, Codex, Cursor, and other agents load the same two `SKILL.md` files — copy them into the agent's skills directory (`.qoder/skills/` for Qoder, `.agents/skills/` for Codex, `.claude/skills/` for Claude Code). See [Agent Skills](skills/README.md) for the catalog and [the skills quickstart](skills/QUICKSTART.md) for per-agent install.
 
 ## Architecture
 
