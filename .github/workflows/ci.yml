@@ -27,7 +27,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "1.22.x"
           cache-dependency-path: |
@@ -36,14 +36,14 @@ jobs:
             examples/sdk/go/go.sum
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.11"
           cache: pip
           cache-dependency-path: tools/requirements.txt
 
       - name: Set up Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
@@ -78,6 +78,13 @@ jobs:
       - name: Run CI
         run: make ci
 
+      # Vulnerability scan. Non-blocking for now: most findings are Go std-lib
+      # CVEs that track the toolchain version (cleared by bumping Go), not the
+      # repo's own deps. Drop continue-on-error once findings are triaged.
+      - name: Vulnerability scan (govulncheck)
+        run: make vulncheck
+        continue-on-error: true
+
       - name: Run Playwright UI tests
         run: |
           make quickstart &
@@ -108,7 +115,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set up Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: "1.22.x"
           cache-dependency-path: go.sum
